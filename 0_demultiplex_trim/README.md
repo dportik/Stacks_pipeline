@@ -18,7 +18,8 @@ same level that are called '2_Post_Demultiplex' and '3_Trimmed_Output' during th
 In each subdirectory you will need to create a barcode file called "barcode.txt" with the relevant 
 information for your samples.
 
-Mine are structured like this so the samples get renamed based on their barcode:
+Mine are structured like this so the samples get renamed based on their barcode (no line breaks in actual file):
+
 CGATC	1_CUMV_15058
 
 GGTTG	1_CUMV_15060
@@ -40,7 +41,9 @@ which currently has several barcoded individuals within it. In my implementation
 
 I assume these are single (not paired-end) reads and the enzyme used is 'sbfI'. The overall structure of the 'process_barcodes'
 command is below:
+
          process_radtags -f INDEX.gz -i gzfastq -y fastq -o . -b barcode.txt -c -q -r -e sbfI
+         
 After demultiplexing, the script will run 'fastqc' on each 'SAMPLE.fq' file before moving to next subdirectory. The output of 
 each sample is contained in a separate folder in the subdirectory, which can be visualized as an html page.
 The script will then collect relevant information from the log files from each subdirectory and concatenate them 
@@ -61,11 +64,17 @@ The trimmed reads are renamed and then moved to a final folder, '3_Trimmed_Outpu
 the next script, '0_stacks_pipeline.py'.
 
 Written for Python 2.7.3
+
 External Dependencies:
+
 fastqc (call from command line)
+
 stacks (tested for v 1.35):
+
     process_radtags (called from command line, put stacks in path)
+    
 fastx (call from command line):
+
     fastx_trimmer
 
 
