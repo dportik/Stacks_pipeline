@@ -5,13 +5,13 @@ ex. python 0_demultiplex_trim.py /Volumes/Project1/Main_Dir/
 Requires the following folder and file structure to run properly:
 
 Main Directory 
-	- Subdirectory
-		- FILE.gz
-		- barcode.txt
-	- Subdirectory
-		- FILE.gz
-		- barcode.txt
-	- etc.
+  Subdirectory
+		FILE.gz
+		barcode.txt
+	Subdirectory
+		FILE.gz
+		barcode.txt
+	etc.
 
 I name my main directory folder "1_Raw_data", as additional directories are created on the
 same level that are called '2_Post_Demultiplex' and '3_Trimmed_Output' during this script.
