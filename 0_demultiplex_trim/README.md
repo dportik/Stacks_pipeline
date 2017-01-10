@@ -81,5 +81,7 @@ fastx (call from command line):
 
 
 # Dan Portik
+
 daniel.portik@uta.edu
+
 February 2016
