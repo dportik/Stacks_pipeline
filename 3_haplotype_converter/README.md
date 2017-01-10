@@ -4,13 +4,13 @@ Usage: python 3_haplotype_converter.py [full path to filtered haplotypes file] [
 
 Designed to work with output of '1_haplo_summary.py' script, particularly the:
 
-'batch_1.singleFirstSNP_haplotypes.tsv' 
+	'batch_1.singleFirstSNP_haplotypes.tsv' 
 
-			or 
+or
       
-'batch_1.singleRandomSNP_haplotypes.tsv'
+	'batch_1.singleRandomSNP_haplotypes.tsv'
 
-		output files. 
+output files. 
     
 Assumes naming scheme is batch_1.SOMETHING_haplotypes.tsv,
 and will rename files with the SOMETHING_haplotypes portion
