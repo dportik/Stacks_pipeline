@@ -17,12 +17,18 @@ Designed to work with output of '1_haplo_summary.py' script, particularly the:
     'batch_1.singleFirstSNP_haplotypes.tsv' 
 
 or 
+
     'batch_1.singleRandomSNP_haplotypes.tsv'
     
 output files. 
 		
 This script requires hand editing at the #*********** indicators.
 
+A majority of this will involve putting your sample names into Python list structures, then deciding which
+configuration of populations you will write to the SNPs file. For example, you could create lists for 6 different
+populations, and write the 1D output for each independently, or use any combination of two of them for the 
+2D output, or any combination of three or four of them for the other outputs. The combination decisions are made
+at the bottom of the script which calls the function for processing the data and writing the file.
 
 Written for Python 2.7.3
 
