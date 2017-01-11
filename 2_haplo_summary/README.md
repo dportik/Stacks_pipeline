@@ -2,6 +2,10 @@
 
 Usage: python 2_haplo_summary.py [full path to 'batch_#.haplotypes.tsv'] [path to a directory to create the output dir in]
 
+Example:
+
+`python 2_haplo_summary.py Volumes/populations_r80/batch_1.haplotypes.tsv Volumes/populations_r80/Output`
+
 This script does a lot of summarizing, and uses the batch_#.haplotypes.tsv output from the 
 populations module of Stacks as input. An output directory called 'Summary_Output_A'
 or 'Summary_Output_B' is created in a user selected directory and several output files
