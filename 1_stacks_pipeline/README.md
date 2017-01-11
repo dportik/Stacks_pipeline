@@ -3,6 +3,7 @@
 Usage: python 1_stacks_pipeline.py [full path to directory containing all de-multiplexed trimmed fq files]
 
 Example:
+
 `python 1_stacks_pipeline.py /Volumes/Project1/3_Trimmed_Output/`
 
 Example file naming scheme (must follow the'SAMPLE.trim.fq' to work!):
