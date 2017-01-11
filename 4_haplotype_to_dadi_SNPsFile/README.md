@@ -2,6 +2,10 @@
 
 Usage: python 4_haplo_to_dadiSNPsV2.py [full path to haplotypes file] [full path to an output directory]
 
+Example:
+
+`python 4_haplo_to_dadiSNPsV2.py Volume/Stacks_Outputs/batch_1.singleRandomSNP_haplotypes.tsv Volume/Stacks_Outputs/Input_Files`
+
 Takes a single SNP per locus haplotype.tsv file and prepares for SNP text file input to dadi.
 
 Will make SNPs input file for one population, two populations, three populations, or 
@@ -21,7 +25,8 @@ or
     'batch_1.singleRandomSNP_haplotypes.tsv'
     
 output files. 
-		
+
+The script as it is will not work with your file.
 This script requires hand editing at the #*********** indicators.
 
 A majority of this will involve putting your sample names into Python list structures, then deciding which
