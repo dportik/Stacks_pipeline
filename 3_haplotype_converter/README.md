@@ -2,6 +2,10 @@
 
 Usage: python 3_haplotype_converter.py [full path to filtered haplotypes file] [full path to an output directory]
 
+Example:
+
+`python 3_haplotype_converter.py Volume/Stacks_Outputs/batch_1.singleRandomSNP_haplotypes.tsv Volume/Stacks_Outputs/Input_Files`
+
 Designed to work with output of '1_haplo_summary.py' script, particularly the:
 
 	'batch_1.singleFirstSNP_haplotypes.tsv' 
