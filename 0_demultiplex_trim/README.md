@@ -2,6 +2,7 @@
 
 Usage: python 0_demultiplex_trim.py [full path to main directory containing several subdirectories, each subdir with an INDEX.gz file from the sequencer]
 
+Example:
 `python 0_demultiplex_trim.py /Volumes/Project1/Main_Dir/`
 
 Requires the following folder and file structure to run properly:
