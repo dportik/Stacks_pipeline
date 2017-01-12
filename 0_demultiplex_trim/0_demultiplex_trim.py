@@ -34,7 +34,7 @@ GCATG	1_DMP_647
 CAACC	1_CUMV_14900
 
 The 'barcode.txt' file will be used for the particular INDEX.gz (zipped!) file located in the same subdirectory as the file,
-which currently has several barcoded individuals within it. In my implementation of the 'process_barcodes' script of stacks v1.35
+which currently has several barcoded individuals within it. In my implementation of the 'process_radtags' script of stacks v1.35
 I assume these are single (not paired-end) reads and the enzyme used is 'sbfI'. The overall structure of the 'process_barcodes'
 command is below:
 
