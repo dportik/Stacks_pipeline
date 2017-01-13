@@ -46,7 +46,7 @@ sstacks call:
 
 populations call:
 
-	populations -b 1 -P . -M {path to script-generated file} -r {0, 50, 70, 80, 90, 100} -t {user decision}
+	populations -b 1 -P . -M {path to script-generated file} -r {0, 50, 60, 70, 80, 90, 100} -t {user decision}
 
 This script was written for and tested with Stacks version 1.35.
 
