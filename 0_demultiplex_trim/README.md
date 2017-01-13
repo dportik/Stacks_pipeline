@@ -21,7 +21,7 @@ same level that are called '2_Post_Demultiplex' and '3_Trimmed_Output' during th
 In each subdirectory you will need to create a barcode file called "barcode.txt" with the relevant 
 information for your samples.
 
-Mine are structured like this so the samples get renamed based on their barcode (no line breaks in actual file):
+Mine are structured like this so the samples get renamed based on their barcode (no double spacing in actual text file):
 
 CGATC	1_CUMV_15058
 
