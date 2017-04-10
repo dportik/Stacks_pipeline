@@ -21,23 +21,18 @@ same level that are called '2_Post_Demultiplex' and '3_Trimmed_Output' during th
 In each subdirectory you will need to create a barcode file called "barcode.txt" with the relevant 
 information for your samples.
 
-Mine are structured like this so the samples get renamed based on their barcode (no double spacing in actual text file):
+Mine are structured like this so the samples get renamed based on their barcode (separated by tab):
 
+```
 CGATC	1_CUMV_15058
-
 GGTTG	1_CUMV_15060
-
 TGCAT	1_CUMV_15175
-
 AAGGA	1_CUMV_15209
-
 TCGAT	1_CAS_258004
-
 AACCA	1_CAS_258161
-
 GCATG	1_DMP_647
-
 CAACC	1_CUMV_14900
+```
 
 The 'barcode.txt' file will be used for the particular INDEX.gz (zipped!) file located in the same subdirectory as the file,
 which currently has several barcoded individuals within it. In my implementation of the 'process_barcodes' script of stacks v1.35
