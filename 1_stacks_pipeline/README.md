@@ -7,19 +7,17 @@ Example:
 `python 1_stacks_pipeline.py /Volumes/Project1/3_Trimmed_Output/`
 
 Example file naming scheme (must follow the'SAMPLE.trim.fq' to work!):
-
+```
 4_MB312.trim.fq
+```
 
 Will result in many intermediate files:
-
+```
 4_MB312.trim.snps.tsv
-
 4_MB312.trim.tags.tsv
-
 4_MB312.trim.alleles.tsv
-
 4_MB312.trim.matches.tsv
-
+```
 
 Full pipeline:
 
