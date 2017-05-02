@@ -16,7 +16,7 @@ sites become constant by narrowing down individuals for a set of populations, th
 ignored. 
 
 
-Designed to work with output of '1_haplo_summary.py' script, particularly the:
+Designed to work with output of '2_haplo_summary.py' script, particularly the:
 
     'batch_1.singleFirstSNP_haplotypes.tsv' 
 
