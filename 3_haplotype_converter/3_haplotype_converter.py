@@ -6,7 +6,7 @@ import numpy as np
 '''
 Usage: python 3_haplotype_converter.py [full path to filtered haplotypes file] [full path to an output directory]
 
-Designed to work with output of '1_haplo_summary.py' script, particularly the:
+Designed to work with output of '2_haplo_summary.py' script, particularly the:
 'batch_1.singleFirstSNP_haplotypes.tsv' 
 			or 
 'batch_1.singleRandomSNP_haplotypes.tsv'
