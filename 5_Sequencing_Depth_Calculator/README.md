@@ -82,7 +82,7 @@ These ouptut files can be used to make plots in R to visualize the data.
     
 Written for Python 2.7
 
-External Dependencies: Numpy (Numerical Python)
+Python Dependencies: Numpy (Numerical Python)
 
 # Dan Portik
 
