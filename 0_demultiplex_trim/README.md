@@ -59,7 +59,7 @@ using fastx_trimmer.
 
 The trimmed reads are renamed and then moved to a final folder, '3_Trimmed_Output'.  If the demultiplexed sample is called
 "SAMPLE_1.fq", it will be renamed to SAMPLE_1.trim.fq during this process.  This directory and contents can be used as the basis for
-the next script, '0_stacks_pipeline.py'.
+the next script, '1_stacks_pipeline.py'.
 
 Written for Python 2.7.3
 
