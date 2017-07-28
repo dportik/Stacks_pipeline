@@ -44,9 +44,9 @@ sstacks call:
 
 populations call:
 
-	populations -b 1 -P . -M {path to script-generated file} -r {0, 50, 60, 70, 80, 90, 100} -t {user decision}
+	populations -b 1 -P . -M {path to script-generated file} -r {0, 50, 60, 70, 80, 90, 100} -t {user decision} --min_maf 0.05
 
-This script was written for and tested with Stacks version 1.35.
+This script was written for and tested with Stacks version 1.35. Note you can edit the call for any of the above modules in the code below for a specific application, these settings are most appropriate for the data sets we have been processing. Familiarize yourself with the different thresholds and parameters to understand the predefined values and how they may affect your processed data.
 
 
 Written for Python 2.7.3
