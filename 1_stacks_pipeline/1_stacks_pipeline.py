@@ -38,7 +38,7 @@ sstacks call:
 	sstacks -b 1 -c batch_1 -s SAMPLE.trim -p {user decision} -o .
 
 populations call:
-	populations -b 1 -P . -M {path to script-generated file} -r {0, 50, 70, 80, 90, 100} -t {user decision}
+	populations -b 1 -P . -M {path to script-generated file} -r {0, 50, 70, 80, 90, 100} -t {user decision} --min_maf 0.05
 
 This script was written for and tested with Stacks version 1.35.
 
@@ -176,7 +176,7 @@ def cstacks_sstacks_populations():
     basic_dir = 'population_no_r'
     if not os.path.exists(basic_dir):
         os.mkdir(basic_dir)
-    pop_string_basic = "populations -b {0} -P {1} -M {2} -t {3}".format('1', '.', full_name, processors)
+    pop_string_basic = "populations -b {0} -P {1} -M {2} -t {3} --min_maf {4}".format('1', '.', full_name, processors,'0.05')
     print '\n', '\n', "{0}: Beginning basic population assessment...".format(datetime.now().strftime("%b-%d %H:%M")), '\n'
     print pop_string_basic, '\n'
     proc_pop_basic = sp.call(pop_string_basic, shell=True)
@@ -195,7 +195,7 @@ def cstacks_sstacks_populations():
         iter_dir = 'population_r{}'.format(r)
         if not os.path.exists(iter_dir):
             os.mkdir(iter_dir)
-        pop_string_iter = "populations -b {0} -P {1} -M {2} -r {3} -t {4}".format('1', '.', full_name, r, processors)
+        pop_string_iter = "populations -b {0} -P {1} -M {2} -r {3} -t {4} --min_maf {5}".format('1', '.', full_name, r, processors,'0.05')
         print '\n', '\n', "{0}: Beginning population assessment of -r {1}...".format(datetime.now().strftime("%b-%d %H:%M"), r), '\n'
         print pop_string_iter, '\n'
         proc_pop_iter = sp.call(pop_string_iter, shell=True)

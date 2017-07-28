@@ -84,12 +84,11 @@ daniel.portik@uta.edu
 February 2016
 '''
 
-print '\n',"##############################################################################"
-print "In the case of a locus with at least one sample with more than two haplotypes," 
-print "do you want to:"
+print '\n',"################################################################################################"
+print "In the case of a locus with at least one sample with more than two haplotypes, do you want to:"
 print '\t', "a. Remove the entire locus from the final output."
 print '\t', "b. Code all those samples as missing data (-), and keep the locus (not recommended because of paralogy issues!)."
-print "##############################################################################",'\n'
+print "################################################################################################",'\n'
 
 decision_analysis = (raw_input("Please select one of the above options (a or b), or 'q' to quit: "))
 print '\n'
