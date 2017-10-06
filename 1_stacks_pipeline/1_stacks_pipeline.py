@@ -38,7 +38,7 @@ sstacks call:
 	sstacks -b 1 -c batch_1 -s SAMPLE.trim -p {user decision} -o .
 
 populations call:
-	populations -b 1 -P . -M {path to script-generated file} -r {0, 50, 70, 80, 90, 100} -t {user decision} --min_maf 0.05
+	populations -b 1 -P . -M {path to script-generated file} -r {0, 50, 60, 70, 80, 90, 100} -t {user decision} --min_maf 0.05
 
 This script was written for and tested with Stacks version 1.35.
 
