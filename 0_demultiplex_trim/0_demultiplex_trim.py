@@ -77,8 +77,11 @@ daniel.portik@uta.edu
 February 2016
 '''
 
-#Decide how many bases to cut
+#Decide on fastqc analyses
 print '\n','\n'
+decision_fastqc = (raw_input("Perform fastqc quality analysis on all demultiplexed samples (y,n)? "))
+print '\n','\n'
+#Decide how many bases to cut
 decision_bp = None
 while decision_bp is None:
     try:
@@ -86,6 +89,8 @@ while decision_bp is None:
     except ValueError:
         print "That wasn't a number."
 print '\n','\n'
+
+
 
 #record start time
 t0 = datetime.datetime.now()
@@ -120,19 +125,21 @@ for folder in file_list:
 
 #*******************************************
 #Begin fastqc routine
-        for filetype in os.listdir('.'):
-            if filetype.endswith('.fq'):
-                print "{0}: Beginning fastqc analysis of {1}...".format(datetime.datetime.now().strftime("%b-%d %H:%M"),filetype), '\n'
-                names = filetype.split('.')
-                dir_name = names[0]
-                if not os.path.exists(dir_name):
-                    os.mkdir(dir_name)
-                call_fastqc = "fastqc -t 2 {0} -o {1}".format(filetype,dir_name)
-                proc_fastqc = sp.call(call_fastqc, shell=True)
-                print '\n', '\n'
-        print '\n', '\n'
-        os.chdir(bin_directory)
-
+        if decision_fastqc == "y":
+            for filetype in os.listdir('.'):
+                if filetype.endswith('.fq'):
+                    print "{0}: Beginning fastqc analysis of {1}...".format(datetime.datetime.now().strftime("%b-%d %H:%M"),filetype), '\n'
+                    names = filetype.split('.')
+                    dir_name = names[0]
+                    if not os.path.exists(dir_name):
+                        os.mkdir(dir_name)
+                    call_fastqc = "fastqc -t 2 {0} -o {1}".format(filetype,dir_name)
+                    proc_fastqc = sp.call(call_fastqc, shell=True)
+                    print '\n', '\n'
+            print '\n', '\n'
+            os.chdir(bin_directory)
+        elif decision_fastqc == "n":
+            os.chdir(bin_directory)
 
 #*******************************************
 #Begin log file routine
