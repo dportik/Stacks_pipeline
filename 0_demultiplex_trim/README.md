@@ -44,6 +44,7 @@ command is below:
          
 Optional: After demultiplexing, the script will run 'fastqc' on each 'SAMPLE.fq' file before moving to next subdirectory. The output of 
 each sample is contained in a separate folder in the subdirectory, which can be visualized as an html page.
+
 The script will then collect relevant information from the log files from each subdirectory and concatenate them 
 in a tab-delimited text file in the main directory, called 'Stacks_ProcessRadtags.log'. This places all of
 the stacks filtering information in one place, which can be opened in excel or a text editor. This is 
