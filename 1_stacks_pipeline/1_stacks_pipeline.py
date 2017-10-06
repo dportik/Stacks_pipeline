@@ -58,6 +58,7 @@ print '\n',"####################################################################
 print "a. Full pipeline: ustacks, cstacks, sstacks, and populations."
 print "b. Run ustacks only."
 print "c. Run cstacks, sstacks, and populations (ustacks previously completed)."
+print "d. Run populations only."
 print "#########################################################################",'\n'
 
 decision_analysis = (raw_input("Please select one of the above options (a, b, c), or 'q' to quit: "))
@@ -208,6 +209,60 @@ def cstacks_sstacks_populations():
                     shutil.move(filetype, iter_dir)
 
 #****************************************************************
+def populations():
+    #---------------------
+    #Begin population routine
+    print '\n', '\n', "****************************************************************",'\n', "Beginning population processing...", '\n', "****************************************************************", '\n', '\n'
+
+    #create set of file names
+    name_set = set()
+    for filetype in os.listdir('.'):
+        if '.trim' in filetype:
+            names = filetype.split('.trim')
+            name = names[0]+'.trim'
+            name_set.add(name)
+    name_list = list(name_set)
+    name_list.sort()
+    print '\n', "There are {} unique files to include for populations module: ".format( len(name_list)), '\n'
+    for name in name_list:
+        print name
+    print '\n', '\n'
+
+    #create single population map file
+    pop_dir = 'population_directory'
+    if not os.path.exists(pop_dir):
+        os.mkdir(pop_dir)
+
+    os.chdir(pop_dir)
+    full_path = os.getcwd()
+    full_name = full_path+'/population_map.txt'
+    fh_pop = open('population_map.txt', 'a')
+    for name in name_list:
+        fh_pop.write(name+'\t'+'1'+'\n')
+    fh_pop.close()
+    os.chdir(main_dir)
+                
+    #---------------------
+    #begin calls of population involving different r values
+    r_list = ["50", "60", "70", "80", "90", "100"]
+    for r in r_list:
+        iter_dir = 'population_r{}'.format(r)
+        if not os.path.exists(iter_dir):
+            os.mkdir(iter_dir)
+        pop_string_iter = "populations -b {0} -P {1} -M {2} -r {3} -t {4} --min_maf {5}".format('1', '.', full_name, r, processors,'0.05')
+        print '\n', '\n', "{0}: Beginning population assessment of -r {1}...".format(datetime.now().strftime("%b-%d %H:%M"), r), '\n'
+        print pop_string_iter, '\n'
+        proc_pop_iter = sp.call(pop_string_iter, shell=True)
+
+        #move files to prevent overwriting
+        for filetype in os.listdir('.'):
+            if filetype.startswith('batch_1'):
+                names = filetype.split('.')
+                if names[1] != 'catalog':
+                    shutil.move(filetype, iter_dir)
+
+
+#****************************************************************
 #Run routines based on user decisions
 
 #Full pipeline:
@@ -283,7 +338,31 @@ elif decision_analysis == "c":
     print "Total time: {}".format(total_t)
     print '\n', '\n'
 
+#populations only
+elif decision_analysis == "d":
+    #Get processor info
+    processors = None
+    while processors is None:
+        try:
+            processors = int(raw_input("Number of processors to use (ex. 4): "))
+        except ValueError:
+            print "That wasn't a number."
+
+    #Record start time
+    t0 = datetime.now()
+
+    #Run routines
+    populations()
     
+    #Calculate total time for processing
+    print '\n', '\n'
+    print "All populations processing finished!", '\n'
+    t1 = datetime.now()
+    total_t = t1 - t0
+    print "Total time: {}".format(total_t)
+    print '\n', '\n'
+
+
 elif decision_analysis == "q":
     print "Quitting program now", '\n'
 
