@@ -26,9 +26,9 @@ then sstacks on a per sample basis. Finally, the population script is run taking
 population, outputs several folders with results from population script with varying -r values 
 (0, 50, 60, 70, 80, 90, 100).
 
-User decides whether to run full pipeline (above), ustacks portion only, or cstacks sstacks and
-populations portion only. As long as you stick to the same directory, you can run ustacks
-first (decision b), then the remaining pipeline later (decision c). 
+User decides whether to run a) full pipeline (above), b) ustacks portion only, c) cstacks sstacks and
+populations portion only, or d) populations only. As long as you stick to the same directory, you can 
+run ustacks first (decision b), then the remaining pipeline later (decision c), or re-run populations (d).
 
 ustacks call:
 
