@@ -5,19 +5,22 @@ The general workflow is to process an entire ddRADseq data set, from raw sequenc
 There are specific instructions in each subdirectory of this pipeline.
 
 
-# Dan Portik
+**Citation Information:**
 
-Postdoctoral Researcher, University of Texas at Arlington
+***Using the pipeline.***
+The scripts involved with this pipeline were originally published as part of the following work:
 
-daniel.portik@uta.edu
++ *Portik, D.M., Leache, A.D., Rivera, D., Blackburn, D.C., Rodel, M.-O., Barej, M.F., Hirschfeld, M., Burger, M., and M.K. Fujita. 2017. Evaluating mechanisms of diversification in a Guineo-Congolian forest frog using demographic model selection. Molecular Ecology, 26: 5245-5263. doi: 10.1111/mec.14266*
 
-August 2016
-
-
-If you decide to use these scripts or modify the code for your purposes, please cite:
+If you use or modify this script for your own purposes, please cite this publication.
 
 
-*Portik, D.M., Leaché, A.D., Rivera, D., Blackburn, D.C., Rödel, M.-O., Barej, M.F., 
-Hirschfeld, M., Burger, M., and M.K. Fujita. 2017. Evaluating mechanisms of diversification 
-in a Guineo-Congolian tropical forest frog using demographic model selection. 
-In press, Molecular Ecology.*
+**Contact:**
+
+Daniel Portik, PhD
+
+Postdoctoral Researcher
+
+University of Arizona
+
+daniel.portik@gmail.com

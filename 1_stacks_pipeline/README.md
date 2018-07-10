@@ -55,17 +55,23 @@ External Dependencies: Stacks v1.35
 
 ustacks, cstacks, sstacks, populations (called from command line)
 
-# Dan Portik
 
-daniel.portik@uta.edu
+**Citation Information:**
 
-February 2016
+***Using the pipeline.***
+The scripts involved with this pipeline were originally published as part of the following work:
+
++ *Portik, D.M., Leache, A.D., Rivera, D., Blackburn, D.C., Rodel, M.-O., Barej, M.F., Hirschfeld, M., Burger, M., and M.K. Fujita. 2017. Evaluating mechanisms of diversification in a Guineo-Congolian forest frog using demographic model selection. Molecular Ecology, 26: 5245-5263. doi: 10.1111/mec.14266*
+
+If you use or modify this script for your own purposes, please cite this publication.
 
 
+**Contact:**
 
-If you decide to use these scripts or modify the code for your purposes, please cite:
+Daniel Portik, PhD
 
-*Portik, D.M., Leaché, A.D., Rivera, D., Blackburn, D.C., Rödel, M.-O., Barej, M.F., 
-Hirschfeld, M., Burger, M., and M.K. Fujita. Evaluating mechanisms of diversification 
-in a Guineo-Congolian forest frog using demographic model selection. 
-In Review, Molecular Ecology.*
+Postdoctoral Researcher
+
+University of Arizona
+
+daniel.portik@gmail.com
