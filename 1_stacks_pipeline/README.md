@@ -34,6 +34,29 @@ ustacks call:
 
 	ustacks -t fastq -f SAMPLE.trim.fq -i {iterable} -o . -r -m 5 -M 2 -p {user decision}
 
+Note: The above settings were selected for 50 bp reads, in which 2 bp mismatches are allowed
+between stacks. On the trimmed reads (39 bp), this corresponds to a 5% divergence. If you
+are using 100 bp or 150 bp reads, you should change the settings of the -M flag from 2 to
+something more appropriate. For 100 bp (post-trimmed 89 bp) perhaps use 4 or 5, and for
+150 bp (post-trimmed 139 bp), maybe use 7 or 8. You can change line 99 of the 1_stacks_pipeline.py
+script to achieve this. Below is the original line:
+
+```
+call_ustacks = "ustacks -t fastq -f {0} -i {1} -o {2} -r -m {3} -M {4} -p {5}".format(filetype, identifier, '.', '5', '2', processors)
+```
+
+For 100 bp reads you can change this to:
+```
+call_ustacks = "ustacks -t fastq -f {0} -i {1} -o {2} -r -m {3} -M {4} -p {5}".format(filetype, identifier, '.', '5', '4', processors)
+```
+
+And for 150 bp reads you can change this to:
+```
+call_ustacks = "ustacks -t fastq -f {0} -i {1} -o {2} -r -m {3} -M {4} -p {5}".format(filetype, identifier, '.', '5', '7', processors)
+```
+
+
+ 
 cstacks call:
 
 	cstacks -b 1 {-s all samples together} -p {user decision} -o .
