@@ -4,6 +4,8 @@ The general workflow is to process an entire ddRADseq data set, from raw sequenc
 
 There are specific instructions in each subdirectory of this pipeline.
 
+This pipeline was written for and tested on Stacks v1.35. If you are using a newer version, I can't guarantee this will be compatible.
+
 
 **Citation Information:**
 
