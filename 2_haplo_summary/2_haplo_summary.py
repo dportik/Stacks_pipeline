@@ -219,13 +219,12 @@ def poly_haplos(lines):
 def haplo_length(lines):
     print '\n',"========================================================"
     print "Now summarizing number of variable site within each locus..." 
-
+    haplo_lines = []
+    length_list = []
+    
     freq_out = "Variable_Sites_Freq_Distribution.txt"
     fh_freq = open(freq_out, 'a')
     fh_freq.write("Sites"+'\t'+"Catalog_ID"+'\n')
-
-    haplo_lines = []
-    length_list = []
 
     #remove "consensus" loci from search by making new list of filtered lines
     for line in lines[1:]:
@@ -238,20 +237,30 @@ def haplo_length(lines):
     for haplo_line in haplo_lines:
         haplo_line_list = haplo_line.split('\t')
         catalog_ID = haplo_line_list[0]
-
+        #print catalog_ID
         #create list of base positions for this locus
         for haplotype in haplo_line_list[2:]:
+           
+            #print haplotype
             #avoid missing data and multiple haplotypes
-            if haplotype != '-' and '/' not in haplotype:
-                bases_list = []
-                for base in haplotype:
-                    bases_list.append(base)
+            if haplotype != '-':
+                if '/' not in haplotype:
+                    bases_list = []
+                    for base in haplotype:
+                        bases_list.append(base)
+                elif '/' in haplotype:
+                    haplotype = haplotype.split('/')[0]
+                    bases_list = []
+                    for base in haplotype:
+                        bases_list.append(base)
+
         #last entry in reset bases_list will have each base position, count length
         locus_length = len(bases_list)
         #append to length list
         length_list.append(locus_length)
         #write length and catalogID to output file
         fh_freq.write("{}".format(locus_length)+'\t'+catalog_ID+'\n')
+
 
     #use quickstats function to turn list to array for stats
     l_avg, l_min, l_max, l_median = quickstats(length_list)
@@ -345,18 +354,26 @@ def biallelic(lines):
         haplo_line_list = haplo_line.split('\t')
         catalog_ID = haplo_line_list[0]
         
-        if int(haplo_line_list[1]) >= int(2):
+        if int(haplo_line_list[1]) >= int(0):
             data_present = int(0) 
             #create list of base positions for this locus
             for haplotype in haplo_line_list[2:]:
-                if haplotype != '-' and '/' not in haplotype:
-                    bases_list = []
-                    for base in haplotype:
-                        bases_list.append(base)
-                        data_present += 1
+                if haplotype != '-':
+                    if '/' not in haplotype:
+                        bases_list = []
+                        for base in haplotype:
+                            bases_list.append(base)
+                            data_present += 1
+                    elif '/' in haplotype:
+                        haplotype = haplotype.split('/')[0]
+                        bases_list = []
+                        for base in haplotype:
+                            bases_list.append(base)
+                            data_present += 1
             ##print "Locus {} has {} positions.".format(catalog_ID, len(bases_list))
 
             flagged = int(0)
+            
             if data_present >= 1:
                 #use the length of the locus to determine the number of indices to search
                 for i in range(len(bases_list)):
@@ -389,7 +406,7 @@ def biallelic(lines):
                         flagged_loci+=1
                         flagged_list.append(catalog_ID)
                         fh_sum.write("Locus {} SNP position {} is not biallelic!".format(catalog_ID,i)+'\n')
-            
+                                    
         if flagged == int(0):
                 #print '\t', "Locus {} is biallelic across all SNP positions.".format(catalog_ID)
                 biallelic_loci+=1
