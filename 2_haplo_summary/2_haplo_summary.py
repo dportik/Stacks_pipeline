@@ -161,6 +161,18 @@ def identical_loci(lines):
             ident_count+=1
             print '\t', "Locus {} has no variation".format(line_list[0])
             invariant_list.append(line_list[0])
+        flattened = set(line_list[2:])
+        if len(flattened) == int(1) and '/' in flattened:
+            fh_ident.write(line+'\n')
+            ident_count+=1
+            print '\t', "Locus {} is blank...".format(line_list[0])
+            invariant_list.append(line_list[0])
+        if len(flattened) == int(2) and '/' in flattened and '-' in flattened:
+            fh_ident.write(line+'\n')
+            ident_count+=1
+            print '\t', "Locus {} is blank...".format(line_list[0])
+            invariant_list.append(line_list[0])
+       
                 
     print "Number of loci with no variation = {}.".format(ident_count)
     print '\n',"{0} file is written to {1} directory.".format(ident_output,out_dir)
@@ -845,7 +857,7 @@ if decision_analysis == "a":
     haplo_length(hap_lines)
     missing_data(hap_lines)
     flagged_list = biallelic(hap_lines)
-    avoid_list = list_gathering(invariant_list,multiple_haplos_list,flagged_list,loci_number)
+    avoid_list = list_gathering(invariant_list, multiple_haplos_list, flagged_list, loci_number)
     output_tsv(hap_lines,avoid_list)
     output2_tsv(hap_lines,avoid_list)
 
@@ -872,7 +884,7 @@ elif decision_analysis == "b":
     haplo_length(hap_lines)
     missing_data(hap_lines)
     flagged_list = biallelic(hap_lines)
-    avoid_list_variation = list_gathering_variation(invariant_list,flagged_list,loci_number)
+    avoid_list_variation = list_gathering_variation(invariant_list, flagged_list, loci_number)
     output_tsv_variation(hap_lines,avoid_list_variation)
     output2_tsv_variation(hap_lines,avoid_list_variation)
 
