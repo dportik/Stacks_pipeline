@@ -232,14 +232,15 @@ def populations():
     pop_dir = 'population_directory'
     if not os.path.exists(pop_dir):
         os.mkdir(pop_dir)
-    	os.chdir(pop_dir)
-    	full_path = os.getcwd()
-    	full_name = full_path+'/population_map.txt'
+    os.chdir(pop_dir)
+    full_path = os.getcwd()
+    full_name = full_path+'/population_map.txt'
+    if not os.path.exists(full_name):
     	fh_pop = open('population_map.txt', 'a')
     	for name in name_list:
         	fh_pop.write(name+'\t'+'1'+'\n')
     	fh_pop.close()
-    	os.chdir(main_dir)
+    os.chdir(main_dir)
                 
     #---------------------
     #begin calls of population involving different r values
