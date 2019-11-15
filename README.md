@@ -3,7 +3,7 @@ Stacks Pipeline
 
 ## Overview
 
-
+Coming soon!
 
 ## Dependencies
 
@@ -17,10 +17,10 @@ The Stacks Pipeline scripts can be run using Mac OSX (10.10+) and Linux, and can
 
 Documentation and usage instructions are available on the wiki page [here](https://github.com/dportik/Stacks_pipeline/wiki). The general order of the workflow is as follows:
 
-1. `Demultiplex_Trim.py`: Demultiplex fastq.gz files using `process_radtags`, trim RAD cutsites with `fastx_trimmer`. Offers option to remove UMI of any length prior to demultiplexing.
-2. `Run_Stacks.py`: Automate the full Stacks pipeline (`ustacks`, `cstacks`, `sstacks`, `tsv2bam`, `gstacks`, `populations`) or partial Stacks pipeline, based on a variety of user-selected options and parameter settings.
-3. `Filter_All_tsv.py`: Apply filtering to loci contained in `populations.haplotypes.tsv` files across different runs of the `populations` module. Calculates per-sample missing data and removes samples above user-selected thresholds. Writes filtered tsv files.
-4. `Convert_All_tsv.py`: Convert filtered tsv files to phylip, fasta, nexus, structure, ped, and map formats. Summarizes dataset metrics.
+1. `Demultiplex_Trim.py`: Demultiplexes fastq.gz files using `process_radtags` and trims RAD cutsites with `fastx_trimmer`. Offers an option to remove UMI sites of any length prior to demultiplexing.
+2. `Run_Stacks.py`: Automates the full Stacks pipeline (`ustacks`, `cstacks`, `sstacks`, `tsv2bam`, `gstacks`, `populations`) or a partial Stacks run (post-ustacks or individual modules), based on a variety of user-selected options and parameter settings.
+3. `Filter_All_tsv.py`: Applies filtering to loci contained in `populations.haplotypes.tsv` files resulting from independent runs of the `populations` module. Calculates per-sample missing data and removes samples above user-selected thresholds. Writes filtered tsv files.
+4. `Convert_All_tsv.py`: Converts filtered tsv files to phylip, fasta, nexus, structure, ped, and map formats. Summarizes dataset metrics.
 
 
 ## Version
