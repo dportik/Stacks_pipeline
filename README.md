@@ -4,6 +4,8 @@ Stacks Pipeline
 ## Overview
 
 
+This pipeline was written for and tested on Stacks v1.35. If you are using a newer version, I can't guarantee this will be compatible.
+
 
 ## Version
 
