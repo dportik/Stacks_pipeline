@@ -4,8 +4,6 @@ Stacks Pipeline
 ## Overview
 
 
-This pipeline was written for and tested on Stacks v1.35. If you are using a newer version, I can't guarantee this will be compatible.
-
 
 ## Version
 
@@ -33,7 +31,6 @@ Documentation and usage instructions are available on the wiki page [here](https
 2. `Run_Stacks.py`
 3. `Filter_All_tsv.py`
 4. `Convert_All_tsv.py`
-
 
 
 ## License
