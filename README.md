@@ -5,16 +5,6 @@ Stacks Pipeline
 
 
 
-## Version
-
-The current release of the Stacks Pipeline is [**v2.0**](https://github.com/dportik/Stacks_pipeline/releases). 
-
-### Major changes in v2.0:
-  - Now uses Stacks v2.41 (vs. 1.35).
-  - All modules are now compatible with Python 2.7 and Python 3.7.
-  - Offers new filtering and output options.
-  - Allows specification of key parameters for Stacks modules (including `-M`, `-m`, and `-n`). 
-
 ## Dependencies
 
 The Stacks Pipeline is relies on fastx_trimmer and Stacks v2.4. These programs must be installed in path. They can be downloaded from the following sources:
@@ -27,11 +17,21 @@ The Stacks Pipeline scripts can be run using Mac OSX (10.10+) and Linux, and can
 
 Documentation and usage instructions are available on the wiki page [here](https://github.com/dportik/Stacks_pipeline/wiki). The general order of the workflow is as follows:
 
-1. `Demultiplex_Trim.py`
-2. `Run_Stacks.py`
-3. `Filter_All_tsv.py`
-4. `Convert_All_tsv.py`
+1. `Demultiplex_Trim.py`: Demultiplex fastq.gz files using `process_radtags`, trim RAD cutsites with `fastx_trimmer`. Offers option to remove UMI of any length prior to demultiplexing.
+2. `Run_Stacks.py`: Automate the full Stacks pipeline (`ustacks`, `cstacks`, `sstacks`, `tsv2bam`, `gstacks`, `populations`) or partial Stacks pipeline, based on a variety of user-selected options and parameter settings.
+3. `Filter_All_tsv.py`: Apply filtering to loci contained in `populations.haplotypes.tsv` files across different runs of the `populations` module. Calculates per-sample missing data and removes samples above user-selected thresholds. Writes filtered tsv files.
+4. `Convert_All_tsv.py`: Convert filtered tsv files to phylip, fasta, nexus, structure, ped, and map formats. Summarizes dataset metrics.
 
+
+## Version
+
+The current release of the Stacks Pipeline is [**v2.0**](https://github.com/dportik/Stacks_pipeline/releases). 
+
+### Major changes in v2.0:
+  - Now uses Stacks v2.41 (vs. 1.35).
+  - All modules are now compatible with Python 2.7 and Python 3.7.
+  - Offers new filtering and output options.
+  - Allows specification of key parameters for Stacks modules (including `-M`, `-m`, and `-n`). 
 
 ## License
 
