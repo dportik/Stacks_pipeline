@@ -1,21 +1,21 @@
 Stacks Pipeline
 ---------------
 
-## Overview
+### Overview
 
-Coming soon!
+The goal of this workflow is to automate all major steps involved with processing common ddRADseq datasets, using the newest version of Stacks (v2.4). In particular, this workflow is designed to process single end (SE) read data generated from libraries prepared with the SbfI and MspI restriction enzymes. The gzipped fastq files from the sequencer are optionally trimmed for UMI sites, demultiplexed using `process_radtags`, and RAD cutsites are removed from the resulting fastq files. The partial or full Stacks pipeline can be run (involving the `ustacks`, `cstacks`, `sstacks`, `tsv2bam`, `gstacks`, and `populations` modules), and the user can specify many key parameters for these steps. A range of missing data values is automatically used for the `populations` module, resulting in several `populations.haplotypes.tsv` files. The `haplotypes.tsv` files resulting from the `populations` module are then subjected to additional filters. These include removing samples exceeding a user-specified threshold of missing data, optionally removing singletons, and selecting one SNP per locus (first site or random site). This step can be run multiple times using different parameter values to see the outcome on samples and loci, creating distinct filtered tsv files each run. Finally, in the last step all filtered `haplotypes.tsv` files are converted into a variety of output formats, including phylip, fasta, nexus, structure, ped, and map files. Summaries of the datasets created from all the filtered tsv files are provided, allowing the user to choose which settings resulted in the highest quality dataset (in terms of number of samples, loci, and missing data). 
 
-## Dependencies
+### Dependencies
 
-The Stacks Pipeline is relies on fastx_trimmer and Stacks v2.4. These programs must be installed in path. They can be downloaded from the following sources:
+The Stacks Pipeline relies on fastx_trimmer and Stacks v2.4. These programs must be installed in path. They can be downloaded from the following sources:
 + [**fastx_trimmer**](http://hannonlab.cshl.edu/fastx_toolkit/download.html)
 + [**Stacks**](http://catchenlab.life.illinois.edu/stacks/)
 
 The Stacks Pipeline scripts can be run using Mac OSX (10.10+) and Linux, and can also work with Windows using a program like Cygwin. 
 
-## Instructions
+### Instructions
 
-Documentation and usage instructions are available on the wiki page [here](https://github.com/dportik/Stacks_pipeline/wiki). The general order of the workflow is as follows:
+Documentation and usage instructions are available on the wiki [here](https://github.com/dportik/Stacks_pipeline/wiki). The general order of the workflow is as follows:
 
 1. `Demultiplex_Trim.py`: Demultiplexes fastq.gz files using `process_radtags` and trims RAD cutsites with `fastx_trimmer`. Offers an option to remove UMI sites of any length prior to demultiplexing.
 2. `Run_Stacks.py`: Automates the full Stacks pipeline (`ustacks`, `cstacks`, `sstacks`, `tsv2bam`, `gstacks`, `populations`) or a partial Stacks run (post-ustacks or individual modules), based on a variety of user-selected options and parameter settings.
@@ -23,20 +23,20 @@ Documentation and usage instructions are available on the wiki page [here](https
 4. `Convert_All_tsv.py`: Converts filtered tsv files to phylip, fasta, nexus, structure, ped, and map formats. Summarizes dataset metrics.
 
 
-## Version
+### Version
 
 The current release of the Stacks Pipeline is [**v2.0**](https://github.com/dportik/Stacks_pipeline/releases). 
 
-### Major changes in v2.0:
+#### Major changes in v2.0:
   - Now uses Stacks v2.41 (vs. 1.35).
   - All modules are now compatible with Python 2.7 and Python 3.7.
-  - Offers new filtering and output options.
+  - Offers new custom filtering and output file options.
   - Allows specification of key parameters for Stacks modules (including `-M`, `-m`, and `-n`). 
 
-## License
+### License
 
 GNU Lesser General Public License v3.0
 
-## Contact
+### Contact
 
 The Stacks Pipeline is maintained by Daniel Portik (daniel.portik@gmail.com)
