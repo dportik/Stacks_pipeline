@@ -18,7 +18,7 @@ def get_args():
     a different directory (-i), the fastq files are first copied (and renamed) to the output directory 
     (-o) before any steps are run in Stacks. The pipeline can be run with all steps (-a full), only post-ustacks 
     steps (-a post-ustacks), or each of the Stacks modules can be accessed separately. Several key parameters 
-    can be set for ustacks (-M, -m), cstacks (-n), and populations (--maf, --mac, --mintype, --whitelist, 
+    can be set for ustacks (-M, -m), cstacks (-n, --catnum), and populations (--maf, --mac, --mintype, --whitelist, 
     --blacklist). The populations module is run using a set of values for the --mintype selection 
     (implementing -r or -R in populations). These values include 10 - 100, with increments of 10. This 
     script can be used to run ustacks independently for separate sets of fastq files for the same 
