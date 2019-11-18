@@ -2,6 +2,7 @@ import argparse
 import os
 import subprocess as sp
 import shutil
+import numpy as np
 from datetime import datetime
 
 def get_args():
@@ -91,6 +92,14 @@ def get_args():
                             help="cstacks OPTIONAL: Number of mismatches allowed between sample "
                             "loci when building the catalog. Default = 2.")
     
+    parser.add_argument("--catnum",
+                            required=False,
+                            type=int,
+                            default=None,
+                            help="cstacks OPTIONAL: Specify the number of samples to build the catalog "
+                            "from, rather than use all samples. This many samples will be drawn randomly "
+                            "from the population map file.")
+    
     parser.add_argument("--maf",
                             required=False,
                             type=float,
@@ -147,14 +156,14 @@ def pipeline_logger(LOG, argd):
     argd: Dictionary of argparse entries.
     """
     with open(LOG, 'a') as fh:
-        fh.write("Run executed: {0}\n\nStacks Pipeline settings:\n-o (outdir): {1}\n-a (analysis): {2}\n"
-                     "-i (indir): {3}\n-t (threads): {4}\n-p (popmap): {5}\n-M (maxdist): {6}\n"
-                     "-m (mindepth): {7}\n--intid (id int start): {8}\n-n (nmismatch): {9}\n"
-                     "--maf (minor allele freq): {10}\n--mac (minor allele count): {11}\n"
-                     "--mintype (r or R): {12}\n--whitelist: {13}\n--blacklist: {14}\n-l (logstring): {15}\n\n"
+        fh.write("Run executed: {}\n\nStacks Pipeline settings:\n-o (outdir): {}\n-a (analysis): {}\n"
+                     "-i (indir): {}\n-t (threads): {}\n-p (popmap): {}\n-M (maxdist): {}\n"
+                     "-m (mindepth): {}\n--intid (id int start): {}\n-n (nmismatch): {}\n--catnum: {}\n"
+                     "--maf (minor allele freq): {}\n--mac (minor allele count): {}\n"
+                     "--mintype (r or R): {}\n--whitelist: {}\n--blacklist: {}\n-l (logstring): {}\n\n"
                      .format(datetime.now(), argd["outdir"], argd["analysis"],
                                  argd["indir"], argd["threads"], argd["popmap"], argd["maxdist"],
-                                 argd["mindepth"], argd["intid"],argd["nmismatch"],
+                                 argd["mindepth"], argd["intid"], argd["nmismatch"], argd["catnum"],
                                  argd["maf"],  argd["mac"], argd["mintype"], argd["whitelist"],
                                  argd["blacklist"], argd["logstring"]))
     
@@ -348,7 +357,7 @@ def generate_pop_map(outdir):
     # send back full path to this file
     return os.path.abspath(outname)
     
-def run_cstacks(outdir, threads, pop_map, nmismatch, LOG):
+def run_cstacks(outdir, threads, pop_map, nmismatch, catnum, LOG):
     """
     Function to process all fastq & output files 
     using the 'cstacks' module of Stacks v2.0+.
@@ -360,6 +369,8 @@ def run_cstacks(outdir, threads, pop_map, nmismatch, LOG):
     pop_map: Full path to the population map file.
     nmismatch: Integer. Number of mismatches allowed between sample
                loci when building the catalog. Default = 2.
+    catnum: Integer. Number of samples to use for building the catalog. This
+            number will be drawn randomly from the population map file.
     LOG: Full path to log file.
     """
     print("\n\n{}".format("="*80))
@@ -372,12 +383,38 @@ def run_cstacks(outdir, threads, pop_map, nmismatch, LOG):
     # check if outputs already present, raise error
     if os.path.exists("catalog.tags.tsv"):
         raise ValueError("\n\n\nERROR: Loci catalog files already exists! Please remove before running.\n")
+
+    # if a subset of samples are to be used to build the catalog
+    if catnum:
+        # open the population map file
+        with open(pop_map, 'r') as fh:
+            # get sample names via list comprehension
+            samples = [l.split()[0] for l in fh]
+        # create a list of X randomly generated numbers from length of sample names,
+        # sampling without replacement
+        indices = np.random.choice(len(samples), catnum, replace=False)
+        # initiate empty list to store name flags
+        cat_samples = []
+        # enumerate sample name list
+        for i, j in enumerate(samples):
+            # see if index is in the random numbers 
+            if i in indices:
+                # if so, append the cstacks flag with this sample name
+                cat_samples.append("-s {}".format(j))
+        # create single string for use in cstacks call
+        samples_str = " ".join(cat_samples)
+        
+        # system call for cstacks
+        call_str = ("cstacks {0} -p {1} -n {2}".format(samples_str, threads, nmismatch))
+
+    else:
+        # system call for cstacks
+        call_str = ("cstacks -P {0} -M {1} -p {2} -n {3}".format(outdir, pop_map, threads, nmismatch))
     
-    # system call for cstacks
-    call_str = ("cstacks -P {0} -M {1} -p {2} -n {3}".format(outdir, pop_map, threads, nmismatch))
     print("{}\n".format(call_str))
     with open(LOG, 'a') as fh:
         fh.write("{0}: Executed cstacks: {1}\n".format(datetime.now(), call_str))
+    
     # use subprocess to execute system call using shell
     proc = sp.call(call_str, shell=True)
     
@@ -403,9 +440,12 @@ def run_sstacks(outdir, threads, pop_map, LOG):
     # change to output directory
     os.chdir(outdir)
     
+    # check if catalog present. if not, raise error
+    if not os.path.exists("catalog.tags.tsv"):
+        raise ValueError("\n\n\nERROR: No catalog files present. Quitting.\n")
+    
     # check if outputs already present, raise error
-    check = [f for f in os.listdir('.') if f.endswith((".matches.tsv"))]
-    if check:
+    if [f for f in os.listdir('.') if f.endswith((".matches.tsv"))]:
         raise ValueError("\n\n\nERROR: Loci match files (.matches.tsv) already exist! Please remove before running.\n")
     
     # system call for sstacks
@@ -438,9 +478,12 @@ def run_tsv2bam(outdir, threads, pop_map, LOG):
     # change to output directory
     os.chdir(outdir)
     
+    # check if sstacks output present, if not raise error
+    if not [f for f in os.listdir('.') if f.endswith((".matches.tsv"))]:
+        raise ValueError("\n\n\nERROR: No loci match files (.matches.tsv) found. Quitting.\n")
+
     # check if outputs already present, raise error
-    check = [f for f in os.listdir('.') if f.endswith((".matches.bam"))]
-    if check:
+    if [f for f in os.listdir('.') if f.endswith((".matches.bam"))]:
         raise ValueError("\n\n\nERROR: tsv2bam match files (.matches.bam) already exist! Please remove before running.\n")
     
     # system call for tsv2bam
@@ -474,8 +517,11 @@ def run_gstacks(outdir, threads, pop_map, LOG):
     os.chdir(outdir)
     
     # check if outputs already present, raise error
-    check = [f for f in os.listdir('.') if f.endswith((".fa.gz", ".calls", ".log.distribs"))]
-    if check:
+    if not [f for f in os.listdir('.') if f.endswith((".matches.bam"))]:
+        raise ValueError("\n\n\nERROR: No tsv2bam match files (.matches.bam) found. Quitting.\n")
+    
+    # check if outputs already present, raise error
+    if [f for f in os.listdir('.') if f.endswith((".fa.gz", ".calls", ".log.distribs"))]:
         raise ValueError("\n\n\nERROR: gstacks output files (catalog.fa.gz and others) already exist! Please remove before running.\n")
     
     # system call for gstacks
@@ -504,14 +550,21 @@ def run_populations(outdir, threads, pop_map, maf, mac, mintype, whitelist, blac
     print("\n\n{}".format("="*80))
     print("\nRunning populations.\n")
     print("{}\n".format("="*80))
-    tb = datetime.now()    
+    tb = datetime.now()
+    
+    # check if gstacks outputs present, if not raise error
+    if not [f for f in os.listdir('.') if f.endswith((".fa.gz", ".calls", ".log.distribs"))]:
+        raise ValueError("\n\n\nERROR: gstacks output files (catalog.fa.gz and others) not found. Quitting.\n")
 
+    # set r (or R) values 
     rvals = ["10", "20", "30", "40", "50", "60", "70", "80", "90", "100"]
+    # iterate over r vals to run populations
     for r in rvals:
         tb1 = datetime.now()
         print("\n\n{}".format("="*70))
         print("Running population module with {0} value {1}".format(mintype, r))
-        print("{}\n\n".format("="*70))  
+        print("{}\n\n".format("="*70))
+        
         rdir = "Populations_{0}{1}".format(mintype, r)
         os.chdir(outdir)
         if not os.path.exists(rdir):
@@ -570,13 +623,14 @@ def main():
     pipeline_logger(LOG, argd)
     print("\n\nStacks Pipeline settings:\n\n-o (outdir): {}\n-a (analysis): {}\n"
               "-i (indir): {}\n-t (threads): {}\n-p (popmap): {}\n-M (maxdist): {}\n"
-              "-m (mindepth): {}\n--intid (id int start): {}\n-n (nmismatch): {}\n"
+              "-m (mindepth): {}\n--intid (id int start): {}\n-n (nmismatch): {}\n--catnum: {}\n"
               "--maf (minor allele freq): {}\n--mac (minor allele count): {}\n"
               "--mintype (r or R): {}\n--whitelist: {}\n--blacklist: {}\n-l (logstring): {}\n\n"
-              .format(argd["outdir"], argd["analysis"], argd["indir"], argd["threads"],
-                          argd["popmap"], argd["maxdist"], argd["mindepth"], argd["intid"],
-                          argd["nmismatch"], argd["maf"],  argd["mac"], argd["mintype"],
-                          argd["whitelist"], argd["blacklist"], argd["logstring"]))
+              .format(argd["outdir"], argd["analysis"],
+                          argd["indir"], argd["threads"], argd["popmap"], argd["maxdist"],
+                          argd["mindepth"], argd["intid"], argd["nmismatch"], argd["catnum"],
+                          argd["maf"],  argd["mac"],
+                          argd["mintype"], argd["whitelist"], argd["blacklist"], argd["logstring"]))
         
     if args.analysis == "full":
         run_ustacks(args.indir, args.outdir, args.threads, args.maxdist, args.mindepth, args.intid, LOG)
@@ -586,7 +640,7 @@ def main():
                 pop_map = args.popmap
             else:
                 pop_map = generate_pop_map(args.outdir)
-            run_cstacks(args.outdir, args.threads, pop_map, args.nmismatch, LOG)
+            run_cstacks(args.outdir, args.threads, pop_map, args.nmismatch, args.catnum, LOG)
             run_sstacks(args.outdir, args.threads, pop_map, LOG)
             run_tsv2bam(args.outdir, args.threads, pop_map, LOG)
             run_gstacks(args.outdir, args.threads, pop_map, LOG)
@@ -600,7 +654,7 @@ def main():
                 pop_map = args.popmap
             else:
                 pop_map = generate_pop_map(args.outdir)
-            run_cstacks(args.outdir, args.threads, pop_map, args.nmismatch, LOG)
+            run_cstacks(args.outdir, args.threads, pop_map, args.nmismatch, args.catnum, LOG)
             run_sstacks(args.outdir, args.threads, pop_map, LOG)
             run_tsv2bam(args.outdir, args.threads, pop_map, LOG)
             run_gstacks(args.outdir, args.threads, pop_map, LOG)
@@ -619,7 +673,7 @@ def main():
                 pop_map = args.popmap
             else:
                 pop_map = generate_pop_map(args.outdir)
-            run_cstacks(args.outdir, args.threads, pop_map, args.nmismatch, LOG)
+            run_cstacks(args.outdir, args.threads, pop_map, args.nmismatch, args.catnum, LOG)
         else:
             raise ValueError("\n\n\nERROR:  No ustacks output files present. Quitting.\n")
        
