@@ -823,10 +823,9 @@ For this step the `Convert_All_tsv.py` script will be used. After the `Filter_Al
 
 + phylip
 + fasta
-+ nexus
++ nexus (two versions: nucleotide and SNAPP)
 + structure
-+ ped
-+ map
++ ped (two versions: nucleotide and '12' recoded)
 + matrix occupancy 
 
 These formats are described in more detail in the [**Outputs**](#CTO) section. 
@@ -917,7 +916,9 @@ Analysis1
 
 For each filtered haplotypes.tsv file found in a given populations subdirectory, the following output files will be written to `Output-Files`:
 
-**phylip**: Written as `NAME.phy`. Common file format used in phylogenetics, including [RAxML](https://cme.h-its.org/exelixis/web/software/raxml/index.html). Here, the single SNPs from all loci are concatenated. Consensus SNPs are used for the samples (data are not phased). Example contents:
+### phylip
+
+Written as `NAME.phy`. Common file format used in phylogenetics, including [RAxML](https://cme.h-its.org/exelixis/web/software/raxml/index.html). Here, the single SNPs from all loci are concatenated. Consensus SNPs are used for the samples (data are not phased). Example contents:
 
 ```
 243 371
@@ -935,7 +936,9 @@ din_CAS256693 TNGGAATCCTCATGTAGGGCGTATGGCANGCCCMGTNGANTCGNTTNTCTTGAACACAANA...
 
 ```
 
-**fasta**: Written as `NAME.fasta`. Common file format for storing sequence data. Here, the single SNPs from all loci are concatenated. Consensus SNPs are used for the samples (data are not phased). Example contents:
+### fasta
+
+Written as `NAME.fasta`. Common file format for storing sequence data. Here, the single SNPs from all loci are concatenated. Consensus SNPs are used for the samples (data are not phased). Example contents:
 
 ```
 >din_9250
@@ -952,7 +955,9 @@ TTGGAATCCTCATGTAGGGCGTATGGCAAGNCNMGTNGAATCGCTTCNCTNGAACACAARACNTCG...
 TTGGAATCCTCATGTAGGGSGTATGGCANGNCCCGTAGNATCGCTTCTCTNGAACACAARACATCG...
 ```
 
-**nexus**: Written as `NAME.nex`. Common file format for phylogenetics. Here, the single SNPs from all loci are concatenated. Consensus SNPs are used for the samples (data are not phased). Example contents:
+### nucleotide nexus
+
+Written as `NAME.nex`. Common file format for phylogenetics. Here, the single SNPs from all loci are concatenated. Consensus SNPs are used for the samples (data are not phased). Example contents:
 
 ```
 #NEXUS 
@@ -971,7 +976,34 @@ din_CAS254156 NTGGAATCCTCATGTAGGGSGTATGGCANGCCCCGTAGAATCGCTTCTCTTGAACACAARA...
 din_CAS254157 TTGGAATCCNCATGTAGGGSGTATGGCAAGCCCCGTNGAATCGNTTCKCTTGAACACAAAA...
 ```
 
-**structure**: Written as `NAME.str`. A file containing phased data for each locus. The structure file produced is compatible with the program [Structure](https://web.stanford.edu/group/pritchardlab/structure.html) and the R package [adegenet](https://github.com/thibautjombart/adegenet/wiki). Example contents:
+### integer nexus
+
+Written as `NAME_SNAPP.nex`. A nexus file that can be imported and used for [SNAPP](https://www.beast2.org/snapp/). Here, instead of DNA nucleotides the characters are integers (0, 1, 2). The characters 0 and 2 represent homozygous SNP sites, and 1 represents heterozygous SNP sites. For this file, the assignment of 0 and 2 is random. That is, A/A is not always coded as 0 across the loci, it could be 0 or 2. This should prevent a known issue with biased assignment in SNAPP. Example contents:
+
+```
+#NEXUS 
+BEGIN DATA;
+	DIMENSIONS  NTAX=105 NCHAR=989;
+	FORMAT DATATYPE=INTEGERDATA SYMBOLS="012" GAP=- ;
+MATRIX
+occ_CAR022 002022020220201022222220211020220-00000220-01002000220-0210000000-0-210...
+occ_CAR023 002022020-202000222-2020200020-200-0-00220-020020022200022000001-202210...
+occ_CAS207784 -12002000220000022222220--20202--0000-0220-02002002-2-102200-2102202...
+occ_CAS207785 01100200-2200000222222202-202020-0000--220002002002020012200-2102202...
+occ_CAS207794 -1000200-2201000-22222202-202-1-00000--220002002002-2-00-20002002202...
+occ_CAS207795 01-01200-1201000-2222220202020-0-0000-0220-02002002-2-002200-2102202...
+occ_CAS207829 012012000120100-222-22202-20-020010000-22000200200202010220002000202...
+occ_CAS249970 00202202-2202000222222202000202210000-0220012002-0202000220000000202...
+occ_CAS249971 00202-0202202000222--22020002-2200-0-002200020020-2020-0220000000202...
+occ_CAS253588 00-122010220200022222220-00020100000000220002002002020-022-0000-0202...
+occ_CAS253592 0020220102202000222-2220200-20-0000000022000200200202000220000000202...
+occ_CAS254057 012002000220-000-221222020102--000000-0220-02002002-2002220002000202...
+occ_CAS254058 011-020002202000222222102020-010-0000-0220-020020020200122-002000202...
+```
+
+### structure
+
+Written as `NAME.str`. A file containing phased data for each locus. The structure file produced is compatible with the program [Structure](https://web.stanford.edu/group/pritchardlab/structure.html) and the R package [adegenet](https://github.com/thibautjombart/adegenet/wiki). Example contents:
 
 ```
 din_9250	-9	-9	4	4	1	-9	2	3	-9	2	3	-9	-9	4	2	1...
@@ -987,7 +1019,9 @@ din_CAS254135	2	2	4	4	1	1	2	3	3	2	3	1	2	4	2...
 din_CAS254136	2	2	4	4	1	1	2	3	3	2	3	1	2	4	2...
 ```
 
-**standard ped**: Written as `NAME.ped`. A ped file in which alleles are represented by nucleotides. Example contents:
+### standard ped
+
+Written as `NAME.ped`. A ped file in which alleles are represented by nucleotides. Example contents:
 ```
 din_9250 din_9250 0 0 0 0 0 0 0 0 G G G G A A 0 0 T T C C 0 0 T T C C 0 0 0 0 G G...
 din_9251 din_9251 0 0 0 0 T T T T G G G G A A 0 0 T T C C C C T T C C A A T T G G...
@@ -1001,10 +1035,12 @@ din_CAS254157 din_CAS254157 0 0 0 0 T T T T G G G G A A A A T T C C C C 0 0 C C 
 din_CAS254158 din_CAS254158 0 0 0 0 T T 0 0 G G G G A A A A T T C C C C C T C C 0...
 ```
 
-**standard map**: Written as `NAME.map`. The map file associated with the standard ped file. It is largely devoid of information, but required by some programs.
+Included is also a **standard map**: Written as `NAME.map`. The map file associated with the standard ped file. It is largely devoid of information, but required by some programs.
 
 
-**recoded ped**: Written as `NAME.ped`. A ped file in which alleles are represented by 2 (major allele) and 1 (minor allele). The 'recoded' ped file is required for the program [Admixture](http://software.genetics.ucla.edu/admixture/). Example contents:
+### recoded ped
+
+Written as `NAME.ped`. A ped file in which alleles are represented by 2 (major allele) and 1 (minor allele). The 'recoded' ped file is required for the program [Admixture](http://software.genetics.ucla.edu/admixture/). Example contents:
 ```
 din_9250 din_9250 0 0 0 0 0 0 0 0 2 2 2 2 2 2 0 0 2 2 2 2 0 0 2 2 2 2 0 0 0 0 2 2...
 din_9251 din_9251 0 0 0 0 2 2 2 2 2 2 2 2 2 2 0 0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2...
@@ -1018,10 +1054,12 @@ din_CAS254157 din_CAS254157 0 0 0 0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 0 0 2 2 
 din_CAS254158 din_CAS254158 0 0 0 0 2 2 0 0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 0...
 ```
 
-**recoded map**: Written as `NAME.map`. The map file associated with the recoded ped file. It is largely devoid of information, but required by some programs.
+Included is also a **recoded map**: Written as `NAME.map`. The map file associated with the recoded ped file. It is largely devoid of information, but required by some programs.
 
 
-**matrix occupancy**: Written as `NAME.occupancy.csv`. A file that can be used to quickly visualize the data matrix using the tool [here](https://bmedeiros.shinyapps.io/matrix_condenser/). It is just a presence/absence matrix for all the loci per sample. Example contents:
+### matrix occupancy
+
+Written as `NAME.occupancy.csv`. A file that can be used to quickly visualize the data matrix using the tool [here](https://bmedeiros.shinyapps.io/matrix_condenser/). It is just a presence/absence matrix for all the loci per sample. Example contents:
 ```
 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24...
 din_9250,0,0,1,1,1,0,1,1,0,1,1,0,0,1,1,1,0,1,1,1,1,1,0,0,1,0,1,0...
@@ -1036,6 +1074,8 @@ din_CAS254157,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1...
 din_CAS254158,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1...
 ```
 
+
+### Dataset summaries
 
 In addition, a summary file called `Convert_All_tsv.summary.txt` is written to the input directory (`-i`), which contains information on the number of loci and samples contained in every filtered tsv file. This is a complete summary of the final datasets. Here is an example of the contents:
 
