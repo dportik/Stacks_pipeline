@@ -1,0 +1,1 @@
+The `stacks_pipeline_wiki.md` file is a backup of the [wiki page](https://github.com/dportik/Stacks_pipeline/wiki/Stacks-Pipeline-Instructions). Please navigate to the wiki page to access the documentation. 
