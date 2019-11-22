@@ -59,7 +59,7 @@ def find_dirs(indir):
     os.chdir(indir)
     
     # list comprehension to get all subdirs here (should only be populations-related)
-    paths = sorted([os.path.abspath(f) for f in os.listdir('.') if os.path.isdir(f)])
+    paths = sorted([os.path.abspath(f) for f in os.listdir('.') if os.path.isdir(f) and f.startswith('Populations')])
     
     print("\n\nFound {} populations directories.".format(len(paths)))
     
