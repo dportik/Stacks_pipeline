@@ -731,7 +731,7 @@ The `Filter_All_tsv.py` script can be run with different missing data values (`-
 
 ## Outputs <a name=FTO></a>
 
-Portions of the output file names (indicated by `#` below) are filled by the argument values used to run the script, and the other portion (indicated by `XX` below) is filled by the r or R value of the populations directory. This means different values of per sample missing data (-m) can be run on the same input directory. Each `-m` value will produce unique output files (rather than causing overwriting).
+Portions of the output file names (indicated by `#` below) are filled by the argument values used to run the script, and the other portion (indicated by `XX` below) is filled by the r or R value of the populations directory. This means different values of per sample missing data (`-m`) can be run on the same input directory. Each `-m` value will produce unique output files (rather than causing overwriting).
 
 In each of the populations subdirectory, the output files include:
 
@@ -902,7 +902,7 @@ Analysis1
 │	├── Populations_r30
 │	│	├── files...
 │	│	└── Output-Files
-│	│		└── fnew files...
+│	│		└── new files...
 │	│	
 │	├── Populations_r40
 │	│	├── files...
@@ -1001,7 +1001,7 @@ din_CAS254157 din_CAS254157 0 0 0 0 T T T T G G G G A A A A T T C C C C 0 0 C C 
 din_CAS254158 din_CAS254158 0 0 0 0 T T 0 0 G G G G A A A A T T C C C C C T C C 0...
 ```
 
-**standard map**: Written as `NAME.map`. The map file associated with the standard ped file. It is largely devoid of information, but required by some programs).
+**standard map**: Written as `NAME.map`. The map file associated with the standard ped file. It is largely devoid of information, but required by some programs.
 
 
 **recoded ped**: Written as `NAME.ped`. A ped file in which alleles are represented by 2 (major allele) and 1 (minor allele). The 'recoded' ped file is required for the program [Admixture](http://software.genetics.ucla.edu/admixture/). Example contents:
@@ -1018,7 +1018,7 @@ din_CAS254157 din_CAS254157 0 0 0 0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 0 0 2 2 
 din_CAS254158 din_CAS254158 0 0 0 0 2 2 0 0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 0...
 ```
 
-**recoded map**: Written as `NAME.map`. The map file associated with the recoded ped file. It is largely devoid of information, but required by some programs).
+**recoded map**: Written as `NAME.map`. The map file associated with the recoded ped file. It is largely devoid of information, but required by some programs.
 
 
 **matrix occupancy**: Written as `NAME.occupancy.csv`. A file that can be used to quickly visualize the data matrix using the tool [here](https://bmedeiros.shinyapps.io/matrix_condenser/). It is just a presence/absence matrix for all the loci per sample. Example contents:
@@ -1062,6 +1062,10 @@ populations_r50.haplotypes.filtered_m50_randomSNP.tsv	7155	114	815670	265103	32.
 populations_r50.haplotypes.filtered_m70_randomSNP.tsv	7196	119	856324	284758	33.3
 populations_r50.haplotypes.filtered_m90_randomSNP.tsv	7261	120	871320	293377	33.7
 ```
+
+This file in particular allows a direct comparison of the datasets produced by different r/R values and per-sample missing data thresholds (m). It should be useful in helping to decide which datasets to carry forward for empirical analyses.
+
+
 
 [Back to top](#TOP)
 
