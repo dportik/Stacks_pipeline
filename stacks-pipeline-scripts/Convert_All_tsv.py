@@ -12,7 +12,7 @@ def get_args():
     parser = argparse.ArgumentParser(
             description="""---------------------------------------------------------------------------
     Convert_All_tsv - Converts all available FILTERED haplotypes.tsv files into several types of output 
-    files, including phylip, fasta, nexus, structure, ped, and map files. The structure file produced is
+    files, including phylip, fasta, nexus, structure, ped, map, and occupancy files. The structure file produced is
     compatible with the program Structure and the R package Adegenet. Two versions of the ped and map files 
     are created: a 'simple' ped file in which alleles are represented by nucleotides, and a 'recoded' ped 
     file in which alleles are represented by 2 (major allele) and 1 (minor allele). The 'recoded' ped file 
@@ -432,6 +432,60 @@ def write_recoded_ped(tsv_dict, samples, label, outdir):
     # move output(s) to correct directory
     for f in [ped, dumbmap]:
         shutil.move(f, outdir)
+        
+def write_occupancy(sample_dict, samples, label, outdir):
+    """
+    Function to write an "occupancy" file, for use with specific 
+    data visualization tool: 
+    https://bmedeiros.shinyapps.io/matrix_condenser/
+
+    Arguments:
+    sample_dict - Dictionary structure of the haplotypes.tsv file in which 
+                  key = sample name, val = list of allele combos for sample 
+                  across all loci (loci in list are in numerical order).
+    samples - A list of the samples included in the tsv file, in correct order.
+    label - A string for output file naming, constructed from parsed tsv name.
+    outdir - Directory to write output files in.
+    """
+    # dictionary of conversion values
+    code_dict = {"A/A":"1",
+                     "C/C":"1",
+                     "G/G":"1",
+                     "T/T":"1",
+                     "A/C":"1",
+                     "A/G":"1",
+                     "A/T":"1",
+                     "C/A":"1",
+                     "C/G":"1",
+                     "C/T":"1",
+                     "G/A":"1",
+                     "G/C":"1",
+                     "G/T":"1",
+                     "T/A":"1",
+                     "T/C":"1",
+                     "T/G":"1",
+                     "N/N":"0",
+                     "-/-":"0"}
+
+    # initiate empty dictionary for converted codes
+    converted_dict = {}
+    # iterate over sample dict
+    for k, v in sample_dict.items():
+        # assign sample as k, assign list of code_dict vals as v
+        converted_dict[k] = [code_dict[i] for i in v]
+        
+    # get number of loci from a sample in dict
+    num_loci = len(sample_dict[samples[0]])
+    header = ",".join([str(i) for i in list(range(0, num_loci+1))])
+
+    # write file
+    occ = "{}.occupancy.csv".format(label)
+    with open(occ, 'a') as fh:
+        fh.write("{}\n".format(header))
+        for k, v in sorted(converted_dict.items()):
+            fh.write("{0},{1}\n".format(k, ",".join(v)))
+    print("\tWrote occupancy file:\t{}".format(occ))
+    shutil.move(occ, outdir)
     
 def check_outputs(maindir, outdir, label):
     """
@@ -511,6 +565,9 @@ def main():
 
                 # write recoded ped file
                 write_recoded_ped(tsv_dict, samples, label, outdir)
+                
+                # write occupancy file
+                write_occupancy(sample_dict, samples, label, outdir)
                 
                 tf2 = datetime.now()
                 print("\n\tDone. Elapsed time:\t{}\n".format(tf2 - tb2))

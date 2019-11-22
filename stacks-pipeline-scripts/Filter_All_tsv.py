@@ -646,7 +646,7 @@ def find_dirs(indir):
     # move to indir
     os.chdir(indir)
     # list comprehension to get all subdirs here (should only be populations-related)
-    paths = sorted([os.path.abspath(f) for f in os.listdir('.') if os.path.isdir(f)])
+    paths = sorted([os.path.abspath(f) for f in os.listdir('.') if os.path.isdir(f) and f.startswith('Populations')])
     
     return paths
     
@@ -661,8 +661,9 @@ def main():
     #create main log file, write analysis settings
     SUMLOG = os.path.join(args.indir, "Filter_All_tsv.summary.m{}_{}SNP.log".format(args.missingdata, args.snpselection))
     if os.path.isfile(SUMLOG):
-        raise ValueError("\n\n\nERROR: Output files for these analysis conditions (-m {}, -s {}) already"
-                             "exist! Please remove before running.\n".format(args.missingdata, args.snpselection))
+        raise ValueError("\n\n\nERROR: A log file exists for these analysis conditions (-m {}, -s {}) already"
+                             "! Please remove any outputs in the populations subdirectories and the following "
+                             "file before running: \n\n{}\n".format(args.missingdata, args.snpselection, SUMLOG))
     else:
         with open(SUMLOG, 'a') as fh:
             fh.write("Filter_All_tsv settings:\n\n-i (indir): {0}\n-m (missingdata): {1}\n-s "
@@ -693,25 +694,30 @@ def main():
             for s in summary:
                 fh.write("{}\n".format(s.strip()))
                 
-        # select one SNP per locus - first SNP or random SNP
-        snp_dict = get_SNPs(filtered_dict, args.snpselection, LOG, "SNP_distributions.m{}.log".format(args.missingdata))
+        if filtered_dict:
+            # select one SNP per locus - first SNP or random SNP
+            snp_dict = get_SNPs(filtered_dict, args.snpselection, LOG, "SNP_distributions.m{}.log".format(args.missingdata))
         
-        # calculate per sample missing data and remove samples below threshold
-        imdout = "Initial_Missing_Data_Per_Sample.m{}_{}SNP.log".format(args.missingdata, args.snpselection)
-        final_dict, final_samples, sum_missing = missing_data(hapfile, snp_dict, args.missingdata, args.remove_singletons, imdout, LOG)
+            # calculate per sample missing data and remove samples below threshold
+            imdout = "Initial_Missing_Data_Per_Sample.m{}_{}SNP.log".format(args.missingdata, args.snpselection)
+            final_dict, final_samples, sum_missing = missing_data(hapfile, snp_dict, args.missingdata, args.remove_singletons, imdout, LOG)
         
-        # write missing data filtering summary to main log file
-        with open(SUMLOG, 'a') as fh:
-            for s in sum_missing:
-                fh.write("\n{}\n".format(s.strip().strip(':')))
-            fh.write("\n{}\n".format("-"*90))
+            # write missing data filtering summary to main log file
+            with open(SUMLOG, 'a') as fh:
+                for s in sum_missing:
+                    fh.write("\n{}\n".format(s.strip().strip(':')))
+                fh.write("\n{}\n".format("-"*90))
 
-        # write final missing data summary
-        fmdout = "Final_Missing_Data_Per_Sample.m{}_{}SNP.log".format(args.missingdata, args.snpselection)
-        write_final_missing_data(final_dict, final_samples, fmdout)
+            if len(final_dict) > 1:
+                # write final missing data summary
+                fmdout = "Final_Missing_Data_Per_Sample.m{}_{}SNP.log".format(args.missingdata, args.snpselection)
+                write_final_missing_data(final_dict, final_samples, fmdout)
         
-        # write final filtered tsv file
-        write_tsv(hapfile, final_dict, final_samples, args.snpselection, args.missingdata, LOG)
+            # write final filtered tsv file
+            write_tsv(hapfile, final_dict, final_samples, args.snpselection, args.missingdata, LOG)
+            
+        else:
+            print_log(LOG, ("\nNo loci left after initial filtering!\nSkipping."))
        
         tf2 = datetime.now()
         print_log(LOG, ("\n\n{}".format("="*80)))
