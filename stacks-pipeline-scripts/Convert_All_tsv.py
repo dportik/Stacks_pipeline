@@ -2,6 +2,7 @@ import argparse
 import os
 import subprocess as sp
 import shutil
+from random import shuffle
 from datetime import datetime
 from collections import Counter
 
@@ -13,8 +14,10 @@ def get_args():
             description="""---------------------------------------------------------------------------
     Convert_All_tsv - Converts all available FILTERED haplotypes.tsv files into several types of output 
     files, including phylip, fasta, nexus, structure, ped, map, and occupancy files. The structure file produced is
-    compatible with the program Structure and the R package Adegenet. Two versions of the ped and map files 
-    are created: a 'simple' ped file in which alleles are represented by nucleotides, and a 'recoded' ped 
+    compatible with the program Structure and the R package Adegenet. Two versions of the nexus file are produced,
+    one containing nucleotides and the other containing integer coding (0, 1, 2) allowing use with SNAPP (via Beauti). 
+    Two versions of the ped and map files 
+    are also created: a 'simple' ped file in which alleles are represented by nucleotides, and a 'recoded' ped 
     file in which alleles are represented by 2 (major allele) and 1 (minor allele). The 'recoded' ped file 
     is required for the program Admixture. This script is meant to run on a directory (-i) containing the 
     outputs of the Run_Stacks.py and Filter_All_tsv.py scripts. It expects separate subdirectories to be present 
@@ -433,6 +436,68 @@ def write_recoded_ped(tsv_dict, samples, label, outdir):
     for f in [ped, dumbmap]:
         shutil.move(f, outdir)
         
+def write_snapp_nexus(tsv_dict, samples, label, outdir):
+    """
+    Function to write SNAPP version of nexus file, in which
+    homozygous SNPs are written as 0 or 2, and heterozygous
+    SNPs are written as 1. The bases are assigned randomly 
+    to prevent any biases (e.g., always turning A into a 0). 
+
+    Arguments:
+    tsv_dict - Dictionary structure of the haplotypes.tsv file, produced
+               by tsv_to_dict(). Keys = loci names, vals = list of allele combos.
+    samples - A list of the samples included in the tsv file, in correct order.
+    label - A string for output file naming, constructed from parsed tsv name.
+    outdir - Directory to write output files in.
+    """
+    
+    # initiate empty dictionary for converted codes
+    converted_dict = {}
+    
+    # iterate over tsv dictionary sorted by locus number
+    for k, v in sorted(tsv_dict.items()):
+        
+        # get all real SNP bases for this locus (exclude N's and -'s)
+        # convert to set and sort, should be length of 2 now
+        bases = sorted(set([x.split('/')[0] for x in v if x != "N/N" and x != "-/-"] +
+                     [x.split('/')[1] for x in v if x != "N/N" and x != "-/-"]))
+
+        # shuffle the bases
+        shuffle(bases)
+        # define new codes for homo and hetero SNPs, missing data
+        temp_dict = {"{0}/{0}".format(bases[0]):"0",
+                         "{0}/{0}".format(bases[1]):"2",
+                         "{0}/{1}".format(bases[0], bases[1]):"1",
+                         "{1}/{0}".format(bases[0], bases[1]):"1",
+                         "N/N":"-",
+                         "-/-":"-"}
+        # replace old SNPs with new codes, add to dict
+        converted_dict[k] = [temp_dict[i] for i in v]
+        
+    # convert locus dict to sample dict
+    sample_dict = dict_to_samples(converted_dict, samples)
+    
+    # get number of loci from a sample in dict
+    num_loci = len(sample_dict[samples[0]])
+
+    # write nexus
+    nex = "{}_SNAPP.nex".format(label)
+    with open(nex, 'a') as fh:
+        fh.write('''
+#NEXUS 
+BEGIN DATA;
+	DIMENSIONS  NTAX={0} NCHAR={1};
+	FORMAT DATATYPE=INTEGERDATA SYMBOLS="012" GAP=- ;
+MATRIX
+'''.format(len(samples), num_loci))
+        for k, v in sorted(sample_dict.items()):
+            fh.write("{0} {1}\n".format(k, "".join(v)))
+        fh.write("\n;\nEnd;")
+    print("\tWrote SNAPP nexus file:\t{}".format(nex))
+
+    # move output to correct directory
+    shutil.move(nex, outdir)
+        
 def write_occupancy(sample_dict, samples, label, outdir):
     """
     Function to write an "occupancy" file, for use with specific 
@@ -556,6 +621,9 @@ def main():
 
                 # write fasta, phylip, and nexus files
                 write_fasta_phy_nex(sample_dict, samples, label, outdir)
+                
+                # write SNAPP nexus file
+                write_snapp_nexus(tsv_dict, samples, label, outdir)
 
                 # write structure file
                 write_struct(sample_dict, samples, label, outdir)
