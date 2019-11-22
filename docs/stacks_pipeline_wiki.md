@@ -9,6 +9,9 @@ Welcome to the Stacks Pipeline wiki! Instructions for using the pipeline can be 
 + ### [**Filtering tsv files**](#FTF)
 + ### [**Converting filtered tsv files**](#CTF)
 
+These sections contain a summary of the tasks performed, usage instructions for the relevant script, and examples of outputs.
+
+**Please note that helpful information can always be printed to the screen for any script by running it using the `-h` option.**
 
 ---------------
 
