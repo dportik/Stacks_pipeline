@@ -7,7 +7,7 @@ The goal of this workflow is to automate all major steps involved with processin
 
 ### Dependencies
 
-The Stacks Pipeline relies on fastx_trimmer and Stacks v2.4. These programs must be installed in path. They can be downloaded from the following sources:
+The Stacks Pipeline relies on **fastx_trimmer** and **Stacks v2.4**. These programs must be installed in path. They can be downloaded from the following sources:
 + [**fastx_trimmer**](http://hannonlab.cshl.edu/fastx_toolkit/download.html)
 + [**Stacks**](http://catchenlab.life.illinois.edu/stacks/)
 
