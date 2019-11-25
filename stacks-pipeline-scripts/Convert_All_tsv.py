@@ -260,15 +260,15 @@ def write_struct(sample_dict, samples, label, outdir):
     # iterate over sample dict
     for k, v in sample_dict.items():
         # get SNPs from first allele of haplotypes for this sample, labeled A
-        converted_dict["{}_A".format(k)] = [code_dict[i.split('/')[0]] for i in v]
+        converted_dict["{}!!A!!".format(k)] = [code_dict[i.split('/')[0]] for i in v]
         # get SNPs from second allele of haplotypes for this sample, labeled A
-        converted_dict["{}_B".format(k)] = [code_dict[i.split('/')[1]] for i in v]
+        converted_dict["{}!!B!!".format(k)] = [code_dict[i.split('/')[1]] for i in v]
 
     # write structure
     struct = "{}.str".format(label)
     with open(struct, 'a') as fh:
         for k, v in sorted(converted_dict.items()):
-            fh.write("{0}\t{1}\n".format(k.replace("_A", "").replace("_B",""), "\t".join(v)))
+            fh.write("{0}\t{1}\n".format(k.replace("!!A!!", "").replace("!!B!!",""), "\t".join(v)))
             
     print("\tWrote structure file:\t{}".format(struct))
     
