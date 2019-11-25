@@ -238,7 +238,13 @@ For this step the `Run_Stacks.py` script will be used. The intended purpose of t
 
 The `Run_Stacks.py` script was designed to take as input the directory containing all the demultiplexed and trimmed fastq files (the output from `Demultiplex_Trim.py`), copy those files to an analysis directory, and run the full Stacks workflow in the analysis directory. A population map file is automatically generated, and it assigns all the fastq files to a single population. This map file is used to call all the samples for the post-ustacks steps. However, the script is extremely flexible and allows any Stacks module to be accessed directly, as well as certain chunks of the workflow (for example, run all steps beyond ustacks). A custom population map file can also be used instead. 
 
-Running the script requires only two flags, the path to the directory to perform the Stacks analyses (`-o`), and the type of Stacks analysis to run (`-a`). However, most use-cases will require specifying where the starting fastq files are, using the optional `-i` flag. The fastq files located in the `-i` directory are then copied (and renamed) to the `-o` directory, and the copied files in the `-o` directory are used to run the Stacks analysis selected with the `-a` flag. 
+Running the script requires only two flags, the path to the directory to perform the Stacks analyses (`-o`), and the type of Stacks analysis to run (`-a`). 
+
+One major requirement is that there are fastq files are in the `-o` directory. There are two ways to accomplish this:
+
++ The directory containing the trimmed fastq files can be specified  with `-i` flag. If this option is used, the fastq files are copied to the `-o` directory, and then the Stacks workflow is run in the `-o` directory. This is the intended workflow, which involves picking up where `Demultiplex_Trim.py` left off.  During the copy, the fastq files are renamed (removing the `.trim.` label if present). This is also the required usage for parallelizing the ustacks step (see sections below).
+
++ If copying the fastq files to a new directory is not desired, their location can be specified directly using the `-o` flag. If this option is used, the Stacks workflow will be run in the `-o` directory using the fastq files present. If there are no fastq files in the `-o` directory, it will crash. Also, if you are picking up where `Demultiplex_Trim.py` left off, the `.trim.` label will not be removed from the fastq file labels. This means it will become part of the sample names, including in the output files (e.g. `din_MVZ23535.trim` instead of `din_MVZ23535`). 
 
 There are many optional flags that control the settings in one or more Stacks modules. Before providing examples of how to use the script, the complete set of arguments is explained below.
 
@@ -318,7 +324,7 @@ We would use the following command to accomplish this task:
 python Run_Stacks.py -i /Analysis/Output-Fastq -o /Analysis/Stacks-Run -a full -t 4
 ```
 
-In the above command, the `-t` flag simply specifies the number of threads to use. This simple command may also include optional flags that affect **ustacks** (`-M`, `-m`), **cstacks** (`-n`, `--catnum`), and **populations** (`--maf`, `--mac`). 
+In the above command, the `-t` flag simply specifies the number of threads to use. This simple command may also include optional flags that affect **ustacks** (`-M`, `-m`), **cstacks** (`-n`, `--catnum`), and **populations** (`--maf`, `--mac`). Using the `-i` and `-o` flags means that the fastq files in `-i` are first copied to `-o` before Stacks is run in the `-o` directory. 
 
 And that's it! You should end up with a series of populations output directories that can then be used for the next step:
 
@@ -365,6 +371,72 @@ Analysis
 ```
 
 In each of the populations output directories, there will be a `populations.haplotypes.tsv` file that is the target of the next step in the pipeline.
+
+
+
+With the usage above, the fastq files in the `Output-Fastq` folder (`-i`) were copied to the `Stacks-Run` folder (`-o`), and the `.trim` component was removed from each fastq label. 
+
+```
+Analysis
+│
+├── Output-Fastq
+│	├── din_9250.trim.fq
+│	├── din_9251.trim.fq
+│	├── din_9252.trim.fq
+│	├── hut_CD15010.trim.fq
+│	├── hut_CD15012.trim.fq
+│	├── hut_CFS1504g.trim.fq
+│	└── hut_CG15146.trim.fq
+│
+├── Stacks-Run
+│	├── din_9250.fq 	<- copied and renamed!
+│	├── din_9251.fq 	<- copied and renamed!
+│	├── din_9252.fq 	<- copied and renamed!
+│	├── hut_CD15010.fq 	<- copied and renamed!
+│	├── hut_CD15012.fq 	<- copied and renamed!
+│	├── hut_CFS1504g.fq <- copied and renamed!
+│	├── hut_CG15146.fq 	<- copied and renamed!
+```
+
+After the copying was completed, the Stacks workflow was then run on the `Stacks-Run` directory (`-o`) using the newly copied fastq files. This is the intended way to run the script, but it does copy the files (taking up more space!).
+
+If copying the fastq files is not desired, the `-i` flag should be excluded and their location can be specified using the `-o` flag instead. For example:
+
+```
+python Run_Stacks.py -o /Analysis/Output-Fastq -a full -t 4
+```
+
+This would have resulted in the following outcome:
+
+```
+Analysis
+│
+├── Output-Fastq
+│	├── din_9250.trim.fq
+│	├── din_9251.trim.fq
+│	├── din_9252.trim.fq
+│	├── hut_CD15010.trim.fq
+│	├── hut_CD15012.trim.fq
+│	├── hut_CFS1504g.trim.fq
+│	│	
+│	├── Populations_r10
+│	│	└── outputs...
+│	│	
+│	├── Populations_r20
+│	│	└── outputs...
+│	│	
+│	├── Populations_r30
+│	│	└── outputs...
+│	│	
+│	├── Populations_r40
+│	│	└── outputs...
+│	│	
+│	├── Populations_r50
+│	│	└── outputs...
+```
+
+The Stacks workflow was run on the `-o` directory using the fastq files present (no copying took place). However, in this case all the sample names in the output files would contain `.trim` in their label. 
+
 
 ### Running the full Stacks workflow for big datasets <a name=RSRSWB></a>
 
@@ -458,11 +530,13 @@ Analysis
 │	 └── hut_CG15146.tags.tsv
 ```
 
-Now all the ustacks output files are created, they are compatible, and they are in the same directory. The remaining portion of the Stacks workflow (all steps after ustacks) can then be run using the `-a post-ustacks` option. In this example, we would use the following command:
+Now all the ustacks output files are created, they are compatible, and they are in the same directory (along with copied fastq files). The remaining portion of the Stacks workflow (all steps after ustacks) can then be run using the `-a post-ustacks` option. In this example, we would use the following command:
 
 ```
 python Run_Stacks.py -o /Analysis/Stacks-Run -a post-ustacks -t 6
 ```
+
+**Note that in this case the `-i` flag should not be used because the fastq files have already been copied to the `-o` directory in the previous steps.**
 
 And that's it! If all remaining modules run successfully you should end up with a series of populations output directories. In each of the populations output directories, there will be a `populations.haplotypes.tsv` file. These `haplotypes.tsv` files are the main targets of the next major step in the pipeline. You can also include any number of the optional flags to change particular settings in **cstacks** or **populations** when running `-a post-ustacks`.
 
