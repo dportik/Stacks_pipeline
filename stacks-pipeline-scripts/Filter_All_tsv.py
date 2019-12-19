@@ -657,6 +657,11 @@ def main():
 
     #find all populations subdirectories
     paths = find_dirs(args.indir)
+
+    if not paths:
+        raise ValueError(("\n\n\nERROR: No Populations sub-directories found within input directory. Please see instructions"
+                              "for script usage, and the required directory structure and file naming at: "
+                              "https://github.com/dportik/Stacks_pipeline/wiki/Stacks-Pipeline-Instructions#FTF"))
     
     #create main log file, write analysis settings
     SUMLOG = os.path.join(args.indir, "Filter_All_tsv.summary.m{}_{}SNP.log".format(args.missingdata, args.snpselection))

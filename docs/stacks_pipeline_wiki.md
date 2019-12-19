@@ -788,6 +788,8 @@ The `-i` directory should be specified as: `-i /Anlaysis1/Stacks-Run`. All of th
 
 The `Filter_All_tsv.py` script can be run with different missing data values (`-m`) to see the effect on the number of samples and loci retained. The output files from each `-m` value are labeled using the value. This serves to prevent overwriting of output files. Running the next major step ([**Converting filtered tsv files**](#CTF)) will summarize results for all of the filtered datasets. In this regard, it is actually better to run multiple `-m` values for the same input directory (`-i`).
 
+**If you are using `Filter_All_tsv.py` to filter files not created with this pipeline, you will have to follow the directory structure above and the naming conventions for the tsv files.** That is, the input directory should contain a sub-directory for each `populations.haplotypes.tsv` file. The sub-directory must start with `Populations_` and must contain the r or R value in the name (e.g., `Populations_r10`, `Populations_R10`). There must be only one `populations.haplotypes.tsv` file in each sub-directory, and that file should also contain the r or R value in the name (e.g., `populations_r10.haplotypes.tsv`, `populations_R10.haplotypes.tsv`). If there are multiple `haplotypes.tsv` files present in a given sub-directory, only one of them will be processed. **This directory structure and the naming conventions must also be used for the subsequent script, `Convert_All_tsv.py`.**
+
 ## Script Arguments <a name=FTSA></a>
 
 **Mandatory Arguments:**
@@ -912,6 +914,7 @@ Here, the `#` indicates additional text which is automatically added by `Filter_
 
 At the end of the script, a main summary file is written to the `-i` directory, called `Convert_All_tsv.summary.txt`. This has a complete summary of every dataset (resulting from every filtered tsv file). This file can be used to compare the datasets and make critical decisions about which one to select for analyses. 
 
+**If you are using `Convert_All_tsv.py` to create output files for `populations.haplotypes.tsv` files not created with this pipeline, you will have to follow the specific directory structure above and the naming conventions explained in `Filter_All_tsv.py`.**
 
 ## Script Arguments <a name=CTSA></a>
 
