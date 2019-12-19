@@ -29,6 +29,7 @@ The general order of the workflow is as follows:
 
 4. **`Convert_All_tsv.py`**: Converts filtered tsv files to phylip, fasta, nexus, structure, ped, and map formats. Summarizes dataset metrics for convenient comparisons.
 
+5. **`Convert_Stacks_Fasta_to_Loci`**: **Optional**. Parses the phased sequences of all samples and loci in a given `populations.samples.fa` fasta file and writes to locus-specific fasta files. Offers option to write both alleles per sample, the first allele, a random allele, or a consensus sequence. An optional filter option is included that only writes loci with at least one variable site. 
 
 ### Version
 
