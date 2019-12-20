@@ -8,6 +8,7 @@ Welcome to the Stacks Pipeline wiki! Instructions for using the pipeline can be 
 + ### [**Running Stacks**](#RS)
 + ### [**Filtering tsv files**](#FTF)
 + ### [**Converting filtered tsv files**](#CTF)
++ ### [**Converting Stacks fasta files**](#CSF)
 
 These sections contain a summary of the tasks performed, usage instructions for the relevant script, and examples of outputs.
 
@@ -1183,6 +1184,157 @@ populations_r50.haplotypes.filtered_m90_randomSNP.tsv	7261	120	871320	293377	33.
 This file in particular allows a direct comparison of the datasets produced by different r/R values and per-sample missing data thresholds (m). It should be useful in helping to decide which datasets to carry forward for empirical analyses.
 
 
+
+[Back to top](#TOP)
+
+-----------
+
+
+# **Converting Stacks fasta files** <a name=CSF></a>
+
+## Contents
+
+[**Overview**](#CSFOV)
+
+[**Script arguments**](#CSFA)
+	
+[**Outputs**](#CSFO)
+
+## Overview <a name=CSFOV></a>
+
+For this step the `Convert_Stacks_Fasta_to_Loci.py` script will be used. When the populations module is run using this pipeline, the `--fasta-samples` flag is used. This produces a fasta file called `populations.samples.fa`, which contains the phased alleles for each sample across all loci. In this pipeline, these files will be present in the populations sub-directories, and are labeled according to the r or R value (e.g., `populations_r100.samples.fa`). The purpose of this script is to parse this large fasta file and write locus-specific fasta files. Given that two alleles are present for each sample per locus, there are a few options available for writing sequences, which are specified with the `-a` flag:
+
++ `-a both`: Writes both alleles per sample. The sequences are labeled as `SampleName_Allele0` and `SampleName_Allele1`.
+
++ `-a first`: Writes only the first allele per sample. The sequences are labeled as `SampleName`.
+
++ `-a random`: Writes one of the two alleles available per sample, selected randomly. The sequences are labeled as `SampleName`.
+
++ `-a consensus`: Writes a consensus sequence created from the two alleles per sample. The sequences are labeled as `SampleName`.
+
+It is possible that many loci in a `populations.samples.fa` file are not actually variable. The `--variable` flag can be used to only write loci which contain at least one variable site. Note that this is not the same as an informative site, which requires at least two individuals to share a mutation at a given site. 
+
+
+## Script arguments <a name=CSFA></a>
+
+The `Convert_Stacks_Fasta_to_Loci.py` script has three mandatory flags and one optional flag:
+
+**Mandatory Arguments:**
+
++ `-f <path-to-file>`: The full path to the Stacks samples fasta file, which will be in the populations sub-directories and called `populations_[rXX].samples.fa` or something similar.
+
++ `-o <path-to-directory>`: The full path to an *existing* directory to write the locus-specific fasta files.
+
++ `-a <choice>`: Choices = *both*, *first*, *random*, *consensus*. Choose which sequence(s) to write per sample per locus, as explained above.
+
+**Optional Arguments**:
+
++ `--variable`:  If used, only retains loci that contain at least one variable site.
+
+
+## Outputs <a name=CSFO></a>
+
+For each locus present in the `populations.samples.fa`, there will be a corresponding fasta file with the locus name written to the output directory. If the `--variable` flag is used, any invariant loci will not be written. 
+
+Example contents of file from `-a both`: 
+
+```
+>din_9251_Allele0
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_9251_Allele1
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_9252_Allele0
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_9252_Allele1
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS253991_Allele0
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_CAS253991_Allele1
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_CAS254135_Allele0
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_CAS254135_Allele1
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS254136_Allele0
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_CAS254136_Allele1
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS254137_Allele0
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS254137_Allele1
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS254156_Allele0
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS254156_Allele1
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS254157_Allele0
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_CAS254157_Allele1
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+```
+
+Example contents of file from `-a first`: 
+
+```
+din_9251
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_9252
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_CAS253991
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_CAS254135
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_CAS254136
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_CAS254137
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS254156
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS254157
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+```
+
+Example contents of file from `-a random`: 
+
+```
+>din_9251
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_9252
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_CAS253991
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_CAS254135
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS254136
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS254137
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS254156
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS254157
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+```
+
+Example contents of file from `-a consensus`: 
+
+```
+>din_9251
+TACACATCTGTAACGCACARCAAGGCTCTTCCATATATTA
+>din_9252
+TACACATCTGTAACGCACARCAAGGCTCTTCCATATATTA
+>din_CAS253991
+TACACATCTGTAACGCACAACAAGGCTCTTCCATATATTA
+>din_CAS254135
+TACACATCTGTAACGCACARCAAGGCTCTTCCATATATTA
+>din_CAS254136
+TACACATCTGTAACGCACARCAAGGCTCTTCCATATATTA
+>din_CAS254137
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS254156
+TACACATCTGTAACGCACAGCAAGGCTCTTCCATATATTA
+>din_CAS254157
+TACACATCTGTAACGCACARCAAGGCTCTTCCATATATTA
+```
 
 [Back to top](#TOP)
 
