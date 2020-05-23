@@ -441,12 +441,12 @@ def run_sstacks(outdir, threads, pop_map, LOG):
     os.chdir(outdir)
     
     # check if catalog present. if not, raise error
-    cat_files = [f for f in os.listdir('.') if f.endswith("atalog.snps.tsv")]:
+    cat_files = [f for f in os.listdir('.') if f.endswith("atalog.snps.tsv")]
     if not cat_files:
         raise ValueError("\n\n\nERROR: No catalog files present. Quitting.\n")
     else:
         full_path = os.path.abspath(cat_files[0])
-        cat_path = full_path.split('.snps.')
+        cat_path = full_path.split('.snps.')[0]
     
     # check if outputs already present, raise error
     if [f for f in os.listdir('.') if f.endswith((".matches.tsv"))]:
