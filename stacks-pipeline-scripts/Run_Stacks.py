@@ -441,19 +441,15 @@ def run_sstacks(outdir, threads, pop_map, LOG):
     os.chdir(outdir)
     
     # check if catalog present. if not, raise error
-    cat_files = [f for f in os.listdir('.') if f.endswith("atalog.snps.tsv")]
-    if not cat_files:
-        raise ValueError("\n\n\nERROR: No catalog files present. Quitting.\n")
-    else:
-        full_path = os.path.abspath(cat_files[0])
-        cat_path = full_path.split('.snps.')[0]
+    if not os.path.exists("catalog.tags.tsv"):
+        raise ValueError("\n\n\nERROR: No catalog files present (internal check). Quitting.\n")
     
     # check if outputs already present, raise error
     if [f for f in os.listdir('.') if f.endswith((".matches.tsv"))]:
         raise ValueError("\n\n\nERROR: Loci match files (.matches.tsv) already exist! Please remove before running.\n")
     
     # system call for sstacks
-    call_str = ("sstacks -c {3} -P {0} -M {1} -p {2}".format(outdir, pop_map, threads, cat_path))
+    call_str = ("sstacks -P {0} -M {1} -p {2}".format(outdir, pop_map, threads))
     print("{}\n".format(call_str))
     with open(LOG, 'a') as fh:
         fh.write("{0}: Executed sstacks: {1}\n".format(datetime.now(), call_str))
@@ -690,7 +686,7 @@ def main():
                 pop_map = generate_pop_map(args.outdir)
             run_sstacks(args.outdir, args.threads, pop_map, LOG)
         else:
-            raise ValueError("\n\n\nERROR:  No catalog from cstacks present. Quitting.\n")
+            raise ValueError("\n\n\nERROR:  No catalog from cstacks present (external check). Quitting.\n")
         
     elif args.analysis == "tsv2bam":
         os.chdir(args.outdir)
