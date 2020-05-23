@@ -441,7 +441,7 @@ def run_sstacks(outdir, threads, pop_map, LOG):
     os.chdir(outdir)
     
     # check if catalog present. if not, raise error
-    if not os.path.exists("catalog.tags.tsv"):
+    if not [f for f in os.listdir('.') if f.endswith(("atalog.snps.tsv", "atalog.tags.tsv", "atalog.alleles.tsv"))]:
         raise ValueError("\n\n\nERROR: No catalog files present. Quitting.\n")
     
     # check if outputs already present, raise error
