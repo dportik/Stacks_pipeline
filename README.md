@@ -9,7 +9,7 @@ The gzipped fastq files from the sequencer are optionally trimmed for UMI sites,
 
 ### Dependencies
 
-The Stacks Pipeline relies on **seqtk** and **Stacks v2.4**. These programs must be installed in path. They can be downloaded from the following sources:
+The Stacks Pipeline relies on **seqtk** (**NEW as of v2.1**) and **Stacks v2.4**. These programs must be installed in path. They can be downloaded from the following sources:
 + [**seqtk**](https://github.com/lh3/seqtk)
 + [**Stacks**](http://catchenlab.life.illinois.edu/stacks/)
 
