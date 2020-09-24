@@ -9,8 +9,8 @@ The gzipped fastq files from the sequencer are optionally trimmed for UMI sites,
 
 ### Dependencies
 
-The Stacks Pipeline relies on **fastx_trimmer** and **Stacks v2.4**. These programs must be installed in path. They can be downloaded from the following sources:
-+ [**fastx_trimmer**](http://hannonlab.cshl.edu/fastx_toolkit/download.html)
+The Stacks Pipeline relies on **seqtk** and **Stacks v2.4**. These programs must be installed in path. They can be downloaded from the following sources:
++ [**seqtk**](https://github.com/lh3/seqtk)
 + [**Stacks**](http://catchenlab.life.illinois.edu/stacks/)
 
 The Stacks Pipeline scripts can be run using Mac OSX (10.10+) and Linux, and can also work with Windows using a program like Cygwin. 
@@ -33,9 +33,12 @@ The general order of the workflow is as follows:
 
 ### Version
 
-The current release of the Stacks Pipeline is [**v2.0**](https://github.com/dportik/Stacks_pipeline/releases). 
+The current release of the Stacks Pipeline is [**v2.1**](https://github.com/dportik/Stacks_pipeline/releases). 
 
-#### Major changes in v2.0:
+#### Major changes in v2.1:
+  - `seqtk` is now used in place of `fastx_trimmer`. It is much faster and easier to install.
+
+Changes in v2.0:
   - Now uses Stacks v2.41 (vs. 1.35).
   - All modules are now compatible with Python 2.7 and Python 3.7.
   - Offers new custom filtering and output file options.

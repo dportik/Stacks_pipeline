@@ -39,9 +39,9 @@ def get_args():
                             required=True,
                             type=int,
                             help="REQUIRED: Supply an integer representing the number of "
-                            "the first base to keep in the demultiplexed fq files, in order "
+                            "bases to remove from the demultiplexed fq files, in order "
                             "to remove the RAD cutsites from the processed reads. If using "
-                            "'sbfI', it is 6 bp long, so enter 7.")
+                            "'sbfI', it is 6 bp long, so enter 6.")
 
     parser.add_argument("-u", "--umi",
                             required=False,
@@ -113,15 +113,14 @@ def trim_umi(indir, paths, umi):
                 prefix = f.split('.')[0]
                 
                 # system call for fastx_trimmer
-                call_str = ("gunzip -c {0} | fastx_trimmer -Q33 -f {1} -z -o {2}_UMI_trimmed.fastq.gz"
-                                   .format(f, umi, prefix))
+                call_str = ("seqtk trimfq -b {0} {1} > {2}_UMI_trimmed.fastq.gz"
+                                   .format(umi, f, prefix))
                 print(call_str)
                 # use subprocess to execute system call using shell
                 proc = sp.call(call_str, shell=True)
 
                 f = datetime.now()
-                e = f-b
-                print("\nElapsed time: {0} (H:M:S)\n".format(e))
+                print("\nElapsed time: {0} (H:M:S)\n".format(f-b))
                 print("---------------------------------------------------")
         else:
             print("\n\nERROR: No sequencing file ending with '.fastq.gz' was found in directory: {}\n\n"
@@ -150,10 +149,11 @@ def trim(fq_list, bases, outdir):
         outname = "{}.trim.fq".format(fq.split('.')[0])
         
         # system call for fastx_trimmer
-        call_str = ("fastx_trimmer -Q33 -f {0} -i {1} -o {2}"
+        call_str = ("seqtk trimfq -b {0} {1} > {2}"
                                .format(bases, fq, outname))
             
         # use subprocess to execute system call using shell
+        print(call_str)
         proc = sp.call(call_str, shell=True)
         
         # move output file to output dir
