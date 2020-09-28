@@ -21,7 +21,7 @@ Documentation and usage instructions are available on the [**wiki page here**](h
 
 The general order of the workflow is as follows:
 
-1. **`Demultiplex_Trim.py`**: Demultiplexes fastq.gz files using `process_radtags` and trims RAD cutsites with `fastx_trimmer`. Offers an option to remove UMI sites of any length prior to demultiplexing.
+1. **`Demultiplex_Trim.py`**: Demultiplexes fastq.gz files using `process_radtags` and trims RAD cutsites with `seqtk`. Offers an option to remove UMI sites of any length prior to demultiplexing.
 
 2. **`Run_Stacks.py`**: Automates the full Stacks pipeline (`ustacks`, `cstacks`, `sstacks`, `tsv2bam`, `gstacks`, `populations`) or a partial Stacks run (post-ustacks or individual modules), based on a variety of user-selected options and parameter settings.
 
