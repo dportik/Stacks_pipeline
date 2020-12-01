@@ -25,7 +25,7 @@ Documentation and usage instructions are available on the [**wiki page here**](h
 
 1. **`Filter_Single_tsv.py`**: Applies filtering to loci contained in the specified `populations.haplotypes.tsv` file resulting from the `populations` module. Selects one SNP per locus (first or random site) and optionally removes singletons. Calculates per-sample missing data and removes samples above user-selected thresholds. Writes filtered tsv file.
 
-2. **`Convert_All_tsv.py`**: Convert the filtered tsv files to phylip, fasta, nexus, structure, ped, and map formats. Summarizes dataset metrics for convenient comparisons.
+2. **`Convert_All_tsv.py`**: Convert the filtered tsv file to phylip, fasta, nexus, structure, ped, and map formats. Summarizes dataset metrics for convenient comparisons.
 
 **The full usage of the pipeline starts with gzipped fastq sequencer files and ends with output files. The general order of the full workflow is as follows:**
 
