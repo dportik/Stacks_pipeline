@@ -46,15 +46,23 @@ def get_args():
     
     parser.add_argument("-s", "--snpselection",
                             required=True,
-                            choices=["first", "random"],
-                            help="REQUIRED: Specify whether to choose the first SNP or a "
-                            "random SNP from each available locus.")
+                            choices=["first", "random", "all"],
+                            help="REQUIRED: Specify whether to choose the first SNP, a "
+                            "random SNP, or all SNPs from each available locus.")
     
     parser.add_argument("--remove_singletons",
                             required=False,
                             action='store_true',
                             help="Optional: After removal of samples failing missing data "
                             "threshold, exclude loci with singleton SNPs.")
+    
+    parser.add_argument("-p", "--permutations",
+                            required=False,
+                            type=int,
+                            default=None,
+                            help="Optional: Create permutations of randomly selected SNPs per "
+                            "haplotypes.tsv file, for a total of the number provided.")
+        
         
     return parser.parse_args()
 
@@ -304,6 +312,51 @@ def rando_base(v):
             
     return new_v, bases
 
+def all_base(v):
+    """
+    Function to select ALL base positions of the haplotypes
+    to retain all SNPs per locus.
+
+    Arguments:
+    v - A list containing the 'haplotypes' of all samples for a locus.
+    """
+    # initiate empty list to store new haplotypes values in 
+    new_v_list = []
+    
+    # get length of a single allele - the number of SNP sites.
+    # reverse sort haplotypes list to get longest entries first (avoids '-' characters),
+    # split first item by '/' to isolate a single allele, take its length
+    bases = len(sorted(v, reverse=True)[0].split('/')[0])
+    
+    # first check to see if > 1 SNP site present
+    if bases > 1:
+        # select random number from range of allele length for this locus
+        for i in range(0, bases):
+            new_v = []
+            #iterate over items in haplotypes list
+            for calls in v:
+                # append '-' characters (missing data) as is
+                if "/" not in calls:
+                    new_v.append(calls)
+                #otherwise take position 'i' from alleles
+                else:
+                    # if this happens to produce 'N/N', write '-' instead
+                    if "{}/{}".format(calls.split('/')[0][i], calls.split('/')[1][i]) == "N/N":
+                        new_v.append("-")
+                    # otherwise write the new allele combo
+                    else:
+                        new_v.append("{}/{}".format(calls.split('/')[0][i], calls.split('/')[1][i]))
+            new_v_list.append(new_v)
+                    
+    # if only a single SNP site present, take all haplotypes as is
+    else:
+        new_v = []
+        for calls in v:
+            new_v.append(calls)
+        new_v_list.append(new_v)
+            
+    return new_v_list, bases
+
 def write_base_dist(base_dist, snpdist):
     """
     Function to write the number of SNP sites per
@@ -318,7 +371,7 @@ def write_base_dist(base_dist, snpdist):
         for b in base_dist:
             fh.write("{}\t{}\n".format(b[0], b[1]))
 
-def get_SNPs(filtered_dict, snpmethod, LOG, snpdist):
+def get_SNPs(filtered_dict, snpmethod, LOG, snpdist, write=True):
     """
     Function automate selection of one SNP per locus. Writes 
     number of SNP sites across loci to separate log file.
@@ -348,13 +401,22 @@ def get_SNPs(filtered_dict, snpmethod, LOG, snpdist):
         # if first SNP, use first_base() function
         if snpmethod == "first":
             single_snps, bases = first_base(v)
+            # add locus name as key and single SNP list as val to new dict
+            snp_dict[k] = single_snps
             
         # if random SNP, use rando_base() function
         elif snpmethod == "random":
             single_snps, bases = rando_base(v)
-            
-        # add locus name as key and single SNP list as val to new dict
-        snp_dict[k] = single_snps
+            # add locus name as key and single SNP list as val to new dict
+            snp_dict[k] = single_snps
+
+        elif snpmethod == "all":
+            snps_list, bases = all_base(v)
+            if len(snps_list) > 1:
+                for i in range(0, len(snps_list)):
+                    snp_dict["{}_{}".format(k, i)] = snps_list[i]
+            else:
+                snp_dict["{}_0".format(k)] = snps_list[0]
         
         # append sublist info of locus name, SNP sites
         base_dist.append([k, bases])
@@ -362,7 +424,8 @@ def get_SNPs(filtered_dict, snpmethod, LOG, snpdist):
     # sort list of sublists by number of SNPs per locus, low to high
     base_dist.sort(key=lambda x: int(x[1]))
     # write SNP summary log file
-    write_base_dist(base_dist, snpdist)
+    if write:
+        write_base_dist(base_dist, snpdist)
     
     tf = datetime.now()
     print_log(LOG, ("\nDone.\nElapsed time: {} (H:M:S)\n".format(tf - tb)))
@@ -563,11 +626,11 @@ def missing_data(f, filtered_dict, thresh, remove_singletons, outname, LOG):
     # get list of final samples included
     final_samples = []
     # enumerate sample_info for easy indexing
-    for i, j in enumerate(sample_info):
+    for s in sample_info:
         # check if current index is in the bad sample index list
-        if i not in bad_indices:
+        if s[0] not in bad_indices:
             # if not, get sample name from sublist: [sample index, sample name, missing data value]
-            final_samples.append(j[1])
+            final_samples.append(s[1])
             
     tf = datetime.now()
     print_log(LOG, ("\nDone.\nElapsed time: {} (H:M:S)\n".format(tf - tb)))
@@ -595,7 +658,7 @@ def write_final_missing_data(final_dict, final_samples, outname):
             fh.write("{0}\t{1}\t{2}\t{3}\n".format(final_samples[i], len(loci)-missing, missing, perc_missing))
 
 
-def write_tsv(f, final_dict, final_samples, snpselection, missingdata, LOG):
+def write_tsv(f, final_dict, final_samples, snpselection, missingdata, LOG, perm):
     """
     Function to write the final filtered tsv file.
 
@@ -613,7 +676,10 @@ def write_tsv(f, final_dict, final_samples, snpselection, missingdata, LOG):
     tb = datetime.now()
     
     # create output file name
-    outname = "{}.haplotypes.filtered_m{}_{}SNP.tsv".format(f.split('.')[0], missingdata, snpselection)
+    if perm:
+        outname = "{}.haplotypes.filtered_m{}_{}SNP.permutation_{}.tsv".format(f.split('.')[0], missingdata, snpselection, perm)
+    elif not perm:
+        outname = "{}.haplotypes.filtered_m{}_{}SNP.tsv".format(f.split('.')[0], missingdata, snpselection)
     print_log(LOG, ("\nWriting data to file: {}".format(outname)))
     # open output file
     with open(outname, 'a') as fh:
@@ -664,7 +730,10 @@ def main():
                               "https://github.com/dportik/Stacks_pipeline/wiki/Stacks-Pipeline-Instructions#FTF"))
     
     #create main log file, write analysis settings
-    SUMLOG = os.path.join(args.indir, "Filter_All_tsv.summary.m{}_{}SNP.log".format(args.missingdata, args.snpselection))
+    if not args.permutations:
+        SUMLOG = os.path.join(args.indir, "Filter_All_tsv.summary.m{}_{}SNP.log".format(args.missingdata, args.snpselection))
+    else:
+        SUMLOG = os.path.join(args.indir, "Filter_All_tsv.summary.m{}_{}SNP.permutations.log".format(args.missingdata, args.snpselection))
     if os.path.isfile(SUMLOG):
         raise ValueError("\n\n\nERROR: A log file exists for these analysis conditions (-m {}, -s {}) already"
                              "! Please remove any outputs in the populations subdirectories and the following "
@@ -681,7 +750,10 @@ def main():
         os.chdir(p)
         # locate the haplotypes.tsv file
         hapfile = [f for f in os.listdir('.') if f.endswith(".haplotypes.tsv")][0]
-        LOG = "Filter_All_tsv.m{}_{}SNP.log".format(args.missingdata, args.snpselection)
+        if not args.permutations:
+            LOG = "Filter_All_tsv.m{}_{}SNP.log".format(args.missingdata, args.snpselection)
+        else:
+            LOG = "Filter_All_tsv.m{}_{}SNP.permutations.log".format(args.missingdata, args.snpselection)
         
         print_log(LOG, ("\n\n{}".format("="*80)))
         print_log(LOG, ("\nProcessing haplotypes.tsv file in directory: {}\n".format(p.split('/')[-1])))
@@ -700,26 +772,42 @@ def main():
                 fh.write("{}\n".format(s.strip()))
                 
         if filtered_dict:
-            # select one SNP per locus - first SNP or random SNP
-            snp_dict = get_SNPs(filtered_dict, args.snpselection, LOG, "SNP_distributions.m{}.log".format(args.missingdata))
-        
-            # calculate per sample missing data and remove samples below threshold
-            imdout = "Initial_Missing_Data_Per_Sample.m{}_{}SNP.log".format(args.missingdata, args.snpselection)
-            final_dict, final_samples, sum_missing = missing_data(hapfile, snp_dict, args.missingdata, args.remove_singletons, imdout, LOG)
-        
-            # write missing data filtering summary to main log file
-            with open(SUMLOG, 'a') as fh:
-                for s in sum_missing:
-                    fh.write("\n{}\n".format(s.strip().strip(':')))
-                fh.write("\n{}\n".format("-"*90))
+            if not args.permutations:
+                print("No permutations requested...")
+                # select one SNP per locus - first SNP or random SNP
+                snp_dict = get_SNPs(filtered_dict, args.snpselection, LOG, "SNP_distributions.m{}.log".format(args.missingdata))
 
-            if len(final_dict) > 1:
-                # write final missing data summary
-                fmdout = "Final_Missing_Data_Per_Sample.m{}_{}SNP.log".format(args.missingdata, args.snpselection)
-                write_final_missing_data(final_dict, final_samples, fmdout)
-        
-            # write final filtered tsv file
-            write_tsv(hapfile, final_dict, final_samples, args.snpselection, args.missingdata, LOG)
+                # calculate per sample missing data and remove samples below threshold
+                imdout = "Initial_Missing_Data_Per_Sample.m{}_{}SNP.log".format(args.missingdata, args.snpselection)
+                final_dict, final_samples, sum_missing = missing_data(hapfile, snp_dict, args.missingdata, args.remove_singletons, imdout, LOG)
+
+                # write missing data filtering summary to main log file
+                with open(SUMLOG, 'a') as fh:
+                    for s in sum_missing:
+                        fh.write("\n{}\n".format(s.strip().strip(':')))
+                    fh.write("\n{}\n".format("-"*90))
+
+                if len(final_dict) > 1:
+                    # write final missing data summary
+                    fmdout = "Final_Missing_Data_Per_Sample.m{}_{}SNP.log".format(args.missingdata, args.snpselection)
+                    write_final_missing_data(final_dict, final_samples, fmdout)
+
+                # write final filtered tsv file
+                write_tsv(hapfile, final_dict, final_samples, args.snpselection, args.missingdata, LOG, None)
+                
+            else:
+                for i in range(1, (args.permutations + 1)):
+                    # select one random SNP
+                    snp_dict = get_SNPs(filtered_dict, "random", LOG, "SNP_distributions.m{}.log".format(args.missingdata), write=False)
+                    imdout = "Initial_Missing_Data_Per_Sample.m{}_{}SNP.permutation_{}.log".format(args.missingdata, args.snpselection, i)
+                    final_dict, final_samples, sum_missing = missing_data(hapfile, snp_dict, args.missingdata, args.remove_singletons, imdout, LOG)
+                    # write final filtered tsv file
+                    write_tsv(hapfile, final_dict, final_samples, args.snpselection, args.missingdata, LOG, i)
+                    if len(final_dict) > 1:
+                        # write final missing data summary
+                        fmdout = "Final_Missing_Data_Per_Sample.m{}_{}SNP.permutation_{}.log".format(args.missingdata, args.snpselection, i)
+                        write_final_missing_data(final_dict, final_samples, fmdout)
+
             
         else:
             print_log(LOG, ("\nNo loci left after initial filtering!\nSkipping."))
