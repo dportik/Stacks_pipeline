@@ -11,34 +11,55 @@ def get_args():
     Get arguments from command line.
     """
     parser = argparse.ArgumentParser(
-            description="""---------------------------------------------------------------------------
+            description="""
     Convert_All_tsv - Converts all available FILTERED haplotypes.tsv files into several types of output 
-    files, including phylip, fasta, nexus, structure, ped, map, and occupancy files. The structure file produced is
+    files. Can be run with the directory structure produced by the STACKS pipeline (-i stacks_dir), a single filtered tsv file (-i file), or 
+    a directory of filtered tsv files (-i directory). In each case, the corresponding path to the directory or file 
+    must be specified using the -p argument. Output formats include phylip, fasta, nexus, structure, ped, map, and occupancy files. The structure file produced is
     compatible with the program Structure and the R package Adegenet. Two versions of the nexus file are produced,
     one containing nucleotides and the other containing integer coding (0, 1, 2) allowing use with SNAPP (via Beauti). 
-    Two versions of the ped and map files 
-    are also created: a 'simple' ped file in which alleles are represented by nucleotides, and a 'recoded' ped 
+    Two versions of the ped and map files are also created: a 'simple' ped file in which alleles are represented by nucleotides, and a 'recoded' ped 
     file in which alleles are represented by 2 (major allele) and 1 (minor allele). The 'recoded' ped file 
-    is required for the program Admixture. This script is meant to run on a directory (-i) containing the 
+    is required for the program Admixture. If run using the Stacks directory (-i stacks_dirs) setting, the directory must contain the 
     outputs of the Run_Stacks.py and Filter_All_tsv.py scripts. It expects separate subdirectories to be present 
     for each population analysis (one for each -r or -R value). Each of these subdirectories must contain a FILTERED 
     version of the original haplotypes.tsv file. More than one filtered tsv file can be present, but the 
     filtered haplotypes file(s) within each subdirectory must follow this naming scheme: 
     'populations_[#].haplotypes.filtered_[#].tsv'. Here, the [#] indicates additional text (automatically 
-    added by Filter_All_tsv.py). If using your own files, this naming structure must be present in order 
-    for the files to be read by this script. The output files for each filtered tsv file in a given subdirectory 
-    are written to a new directory ('Output-Files'). In addition, a summary file ('Convert_All_tsv.summary.txt') is 
-    written to the input directory (-i), which contains the number of loci and samples contained in each tsv file.
+    added by Filter_All_tsv.py). This is mainly to prevent the unfiltered tsv files in those directories from 
+    being processed in this script. The output files for each filtered tsv file in a given subdirectory 
+    are written to a new directory ('Output-Files'). If using the '-i file' option, you also need to supply an output 
+    directory (-o) and label (-l) for the output files. If using the '-i directory' version, you also need to supply an output 
+    directory (-o) only. The files will be automatically renamed based on the tsv file names. For both '-i file' and 
+    '-i directory', this script assumes those tsv files have been previously filtered using Filter_All_tsv.py.  
 
-    DEPENDENCIES: None.
-    ---------------------------------------------------------------------------""")
+    DEPENDENCIES: None.""")
     
-    parser.add_argument("-i", "--indir",
+    parser.add_argument("-i", "--intype",
                             required=True,
-                            help="REQUIRED: The full path to the directory which contains "
-                            "all of the populations output subdirectories produced by Run_Stacks.py "
+                            choices=["stacks_dirs", "file", "directory"],
+                            help="The input type. This can be 1) 'stacks_dirs': The full path to the directory which contains "
+                            "all of the populations output subdirectories produced by Run_Stacks.py. "
                             "These subdirectories must contain at least one filtered haplotypes.tsv "
-                            "file that was produced using Filter_All_tsv.py.")
+                            "file that was produced using Filter_All_tsv.py; 2) 'file': The full path a single filtered haplotypes.tsv "
+                            "file that was produced using Filter_All_tsv.py; or 3) 'directory': The full path to a directory containing multiple filtered haplotypes.tsv "
+                            "files that were produced using Filter_All_tsv.py.")
+    
+    parser.add_argument("-p", "--path",
+                            required=True,
+                            help="The corresponding path to one of the options selected for -i. Must be a directory "
+                            "or a file path.")
+    
+    parser.add_argument("-o", "--outdir",
+                            required=False,
+                            default=None,
+                            help="The full path to an existing directory to write "
+                            "the output files, should only be used with -i file or -i directory.")
+                            
+    parser.add_argument("--label",
+                            required=False,
+                            default=None,
+                            help="A label to add to output files, should only be used with -i file.")
             
     return parser.parse_args()
 
@@ -94,7 +115,8 @@ def tsv_to_dict(f):
             # to make things easier downstream, any "-" characters will be
             # transformed to "-/-"
             if line.strip().split('\t')[2:]:
-                tsv_dict[int(line.split('\t')[0])] = [i.replace("-", "-/-") for i in line.strip().split('\t')[2:]]
+                #tsv_dict[int(line.split('\t')[0])] = [i.replace("-", "-/-") for i in line.strip().split('\t')[2:]]
+                tsv_dict[line.split('\t')[0]] = [i.replace("-", "-/-") for i in line.strip().split('\t')[2:]]
                 
                 # get missing data for locus, add to total
                 total_md += ([i.replace("-", "-/-") for i in line.strip().split('\t')[2:]].count("-/-") +
@@ -573,13 +595,11 @@ def check_outputs(maindir, outdir, label):
     if check:
         raise ValueError("\n\n\nERROR: Output files already exist for {} in "
                              "directory:\n\n\t'{}'.\n\nPlease remove before running!\n".format(f, outdir))        
-    
-def main():
-    args = get_args()
-    tb1 = datetime.now()
 
+def run_paths(indir):
+    tb1 = datetime.now()
     #find all populations subdirectories
-    paths = find_dirs(args.indir)
+    paths = find_dirs(indir)
 
     summary_info = []
     
@@ -643,7 +663,7 @@ def main():
             else:
                 print("\n\n\tThis tsv file appears to be empty!\n\t\tSkipping.\n\n")
             
-    os.chdir(args.indir)
+    os.chdir(indir)
     with open("Convert_All_tsv.summary.txt", 'a') as fh:
         fh.write("{}\t{}\t{}\t{}\t{}\t{}\n".format("tsv_file", "Loci",
                                                        "Samples", "Total_SNP_sites",
@@ -655,6 +675,113 @@ def main():
     print("\n\n{}".format("="*80))
     print("\nTotal elapsed time: {} (H:M:S)\n".format(tf1 - tb1))
     print("{}\n\n".format("="*80))
+
+def run_file(f, outdir, label):
+    tb = datetime.now()
+    print("\nProcessing {}...".format(f))
+    #os.chdir(outdir)
+    summary_info = []
+
+    # ensure output files don't yet exist
+    #check_outputs(p, outdir, label)
+
+    # convert tsv file to dictionary structure
+    tsv_dict, samples, info = tsv_to_dict(f)
+    summary_info.append(info)
+
+    if tsv_dict:
+        # convert tsv_dict into one with samples as keys
+        sample_dict = dict_to_samples(tsv_dict, samples)
+
+        # write fasta, phylip, and nexus files
+        write_fasta_phy_nex(sample_dict, samples, label, outdir)
+
+        # write SNAPP nexus file
+        write_snapp_nexus(tsv_dict, samples, label, outdir)
+
+        # write structure file
+        write_struct(sample_dict, samples, label, outdir)
+
+        # write simple ped file
+        write_simple_ped(sample_dict, tsv_dict, samples, label, outdir)
+
+        # write recoded ped file
+        write_recoded_ped(tsv_dict, samples, label, outdir)
+
+        # write occupancy file
+        write_occupancy(sample_dict, samples, label, outdir)
+
+        tf = datetime.now()
+        print("\n\tDone. Elapsed time:\t{}\n".format(tf - tb))
+
+    else:
+        print("\n\n\tThis tsv file appears to be empty!\n\t\tSkipping.\n\n")
+
+    with open("Convert_All_tsv.summary.txt", 'a') as fh:
+        fh.write("{}\t{}\t{}\t{}\t{}\t{}\n".format("tsv_file", "Loci",
+                                                       "Samples", "Total_SNP_sites",
+                                                       "Missing_SNP_sites", "Perc_Missing_Data"))
+        for i in summary_info:
+            fh.write("{}\t{}\t{}\t{}\t{}\t{}\n".format(i[0].split('/')[0], i[1], i[2], i[3], i[4], i[5]))
+            
+def run_dir(indir, outdir):
+    tb = datetime.now()
+    os.chdir(indir)
+    tsv_files = [f for f in os.listdir('.') if f.endswith('.tsv')]
+    summary_info = []
+    for f in tsv_files:
+        print("\nProcessing {}...".format(f))
+
+        # convert tsv file to dictionary structure
+        tsv_dict, samples, info = tsv_to_dict(f)
+        summary_info.append(info)
+        label = f.split('.tsv')[0]
+
+        if tsv_dict:
+            # convert tsv_dict into one with samples as keys
+            sample_dict = dict_to_samples(tsv_dict, samples)
+
+            # write fasta, phylip, and nexus files
+            write_fasta_phy_nex(sample_dict, samples, label, outdir)
+
+            # write SNAPP nexus file
+            write_snapp_nexus(tsv_dict, samples, label, outdir)
+
+            # write structure file
+            write_struct(sample_dict, samples, label, outdir)
+
+            # write simple ped file
+            write_simple_ped(sample_dict, tsv_dict, samples, label, outdir)
+
+            # write recoded ped file
+            write_recoded_ped(tsv_dict, samples, label, outdir)
+
+            # write occupancy file
+            write_occupancy(sample_dict, samples, label, outdir)
+
+            tf = datetime.now()
+            print("\n\tDone. Elapsed time:\t{}\n".format(tf - tb))
+
+        else:
+            print("\n\n\tThis tsv file appears to be empty!\n\t\tSkipping.\n\n")
+
+    with open("Convert_All_tsv.summary.txt", 'a') as fh:
+        fh.write("{}\t{}\t{}\t{}\t{}\t{}\n".format("tsv_file", "Loci", "Samples", "Total_SNP_sites",
+                                                       "Missing_SNP_sites", "Perc_Missing_Data"))
+        for i in summary_info:
+            fh.write("{}\t{}\t{}\t{}\t{}\t{}\n".format(i[0].split('/')[0], i[1], i[2], i[3], i[4], i[5]))
+
+    
+def main():
+    args = get_args()
+    tb1 = datetime.now()
+    if args.intype == "stacks_dirs":
+        run_paths(args.path)
+    elif args.intype == "file":
+        run_file(args.path, args.outdir, args.label)
+    elif args.intype == "directory":
+        run_dir(args.path, args.outdir)
+
     
 if __name__ == '__main__':
     main()
