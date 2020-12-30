@@ -593,8 +593,8 @@ def check_outputs(maindir, outdir, label):
     os.chdir(maindir)
     # if output files found, raise error
     if check:
-        raise ValueError("\n\n\nERROR: Output files already exist for {} in "
-                             "directory:\n\n\t'{}'.\n\nPlease remove before running!\n".format(f, outdir))        
+        raise ValueError("\n\n\nERROR: Output files already exist in "
+                             "directory:\n\n\t'{}'.\n\nPlease remove before running:\n\n{}\n".format(outdir, check))        
 
 def run_paths(indir):
     tb1 = datetime.now()
