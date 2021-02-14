@@ -27,6 +27,8 @@ Documentation and usage instructions are available on the [**wiki page here**](h
 
 2. **`Convert_All_tsv.py`**: Convert the filtered tsv file to phylip, fasta, nexus, structure, ped, and map formats. Summarizes dataset metrics for convenient comparisons.
 
+3. **`Convert_tsv_to_dadi.py`**: **Optional**. Create a SNPs input file for use with the demographic modeling program dadi.
+
 **The full usage of the pipeline starts with gzipped fastq sequencer files and ends with output files. The general order of the full workflow is as follows:**
 
 1. **`Demultiplex_Trim.py`**: Demultiplexes fastq.gz files using `process_radtags` and trims RAD cutsites with `seqtk`. Offers an option to remove UMI sites of any length prior to demultiplexing.
@@ -39,7 +41,7 @@ Documentation and usage instructions are available on the [**wiki page here**](h
 
 5. **`Convert_Stacks_Fasta_to_Loci`**: **Optional**. Parses the phased sequences of all samples and loci in a given `populations.samples.fa` fasta file and writes to locus-specific fasta files. Offers option to write both alleles per sample, the first allele, a random allele, or a consensus sequence. An optional filter option is included that only writes loci with at least one variable site. 
 
-6. **`Convert_tsv_to_dadi.py`**: Create a SNPs input file for use with the demographic modeling program dadi.
+6. **`Convert_tsv_to_dadi.py`**: **Optional**. Create a SNPs input file for use with the demographic modeling program dadi.
 
 ### Version
 
