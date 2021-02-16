@@ -351,7 +351,7 @@ def generate_pop_map(outdir):
     # open output file
     with open(outname, 'a') as fh:
         # iterate over file prefixes and write to file
-        for i in [f.split('.')[0] for f in os.listdir('.') if f.endswith('.fq')]:
+        for i in sorted([f.split('.fq')[0] for f in os.listdir('.') if f.endswith('.fq')]):
             print("\t{}".format(i))
             fh.write("{0}\t1\n".format(i))
     # send back full path to this file
