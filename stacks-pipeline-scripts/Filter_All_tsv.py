@@ -587,7 +587,7 @@ def missing_data(f, filtered_dict, thresh, remove_singletons, outname, LOG):
         sample_info.append([i, samples[i], missing])
 
     # sort larger list by sample name in sublists (element 1)
-    sample_info.sort(key = lambda x: x[1])
+    #sample_info.sort(key = lambda x: x[1])
     # write initial missing data info to output file
     with open(outname, 'a') as fh:
         fh.write("{}\t{}\n".format("Sample", "Perc_Missing_Data"))
