@@ -116,7 +116,12 @@ def tsv_to_dict(f):
             # transformed to "-/-"
             if line.strip().split('\t')[2:]:
                 #tsv_dict[int(line.split('\t')[0])] = [i.replace("-", "-/-") for i in line.strip().split('\t')[2:]]
-                tsv_dict[line.split('\t')[0]] = [i.replace("-", "-/-") for i in line.strip().split('\t')[2:]]
+                # add catch for lines that only contain N/N and -
+                lineset = set([i for i in line.strip().split('\t')[2:]])
+                if "-" in lineset and "N/N" in lineset and len(lineset) == 2:
+                    pass
+                else:
+                    tsv_dict[line.split('\t')[0]] = [i.replace("-", "-/-") for i in line.strip().split('\t')[2:]]
                 
                 # get missing data for locus, add to total
                 total_md += ([i.replace("-", "-/-") for i in line.strip().split('\t')[2:]].count("-/-") +
@@ -213,6 +218,7 @@ def write_fasta_phy_nex(sample_dict, samples, label, outdir):
     converted_dict = {}
     # iterate over sample dict
     for k, v in sample_dict.items():
+        #print(k, v)
         # assign sample as k, assign list of code_dict vals as v
         converted_dict[k] = [code_dict[i] for i in v]
         
@@ -483,7 +489,7 @@ def write_snapp_nexus(tsv_dict, samples, label, outdir):
         # convert to set and sort, should be length of 2 now
         bases = sorted(set([x.split('/')[0] for x in v if x != "N/N" and x != "-/-"] +
                      [x.split('/')[1] for x in v if x != "N/N" and x != "-/-"]))
-
+        
         # shuffle the bases
         shuffle(bases)
         # define new codes for homo and hetero SNPs, missing data
@@ -687,6 +693,8 @@ def run_file(f, outdir, label):
 
     # convert tsv file to dictionary structure
     tsv_dict, samples, info = tsv_to_dict(f)
+
+    
     summary_info.append(info)
 
     if tsv_dict:
