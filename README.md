@@ -3,7 +3,7 @@ Stacks Pipeline
 
 ### Overview
 
-The goal of this workflow is to automate all major steps involved with processing common ddRADseq datasets, using the newest version of [**Stacks**](http://catchenlab.life.illinois.edu/stacks/) (v2.4). In particular, this workflow is designed to process single end (SE) read data generated from ddRADseq libraries prepared with the *SbfI* and *MspI* restriction enzymes. 
+The goal of this workflow was to automate all major steps involved with processing common ddRADseq datasets, using the newest version of [**Stacks**](http://catchenlab.life.illinois.edu/stacks/) (v2.4). In particular, this workflow is designed to process single end (SE) read data generated from ddRADseq libraries prepared with the *SbfI* and *MspI* restriction enzymes. 
 
 **Full pipeline**: The gzipped fastq files from the sequencer are optionally trimmed for UMI sites, demultiplexed using `process_radtags`, and RAD cutsites are trimmed from all resulting fastq files. The partial or full Stacks pipeline can then be run (involving the `ustacks`, `cstacks`, `sstacks`, `tsv2bam`, `gstacks`, and `populations` modules), and the user can specify several key parameters for these steps. A range of missing data values is automatically used for the `populations` module, resulting in several `populations.haplotypes.tsv` files. These `haplotypes.tsv` files resulting from the `populations` module are then subjected to additional filtering. This includes removing samples exceeding a user-specified threshold of missing data, optionally removing singletons, and selecting one SNP site per locus (either the first site or a random site). This step can be run multiple times using different per-sample missing data thresholds, and distinct filtered tsv files are created for each run. Finally, all the filtered tsv files are converted into corresponding phylip, fasta, nexus, structure, ped, and map files. Summaries of all datasets created from the filtered tsv files are provided, allowing the user to choose which settings resulted in the highest quality dataset (in terms of number of samples, loci, and missing data). 
 
@@ -59,7 +59,3 @@ Changes in v2.0:
 ### License
 
 GNU Lesser General Public License v3.0
-
-### Contact
-
-The Stacks Pipeline is maintained by Daniel Portik (daniel.portik@gmail.com)
